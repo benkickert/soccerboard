@@ -1,9 +1,8 @@
 ﻿/* ============================================================
-   11v11 Soccer Tactics Board (V4.3)
-   - Reset All: also re-shows hidden players (both teams), while still
-     preserving formation & colors.
-   - Removed duplicate explanatory text under Home sliders.
-   - Added "Instructions" label and 0.5-line spacing.
+   11v11 Soccer Tactics Board
+   - Split HTML, CSS, and JS for easier maintenance.
+   - Updated starting layouts and mobile control behavior.
+   - Added a controls toggle and responsive pitch orientation.
    ============================================================ */
 
 const PITCH_LEN = 105;
@@ -648,7 +647,7 @@ function updatePitchOrientation(){
   svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
   if(portrait){
     svg.setAttribute('viewBox', '0 0 68 105');
-    scene.setAttribute('transform', 'translate(68 0) rotate(90)');
+    scene.setAttribute('transform', 'matrix(0 1 -1 0 68 0)');
   }else{
     svg.setAttribute('viewBox', '0 0 105 68');
     scene.removeAttribute('transform');

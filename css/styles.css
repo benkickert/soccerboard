@@ -259,6 +259,13 @@
     color:#cfe0ef;
   }
   .instructions .line + .line{ margin-top:0.5em; } /* 0.5 line space between lines */
+  .instructions-version{
+    margin-top:10px;
+    color:#6f7e8d;
+    font-size:10.5px;
+    font-style:italic;
+    text-align:right;
+  }
   .row-offset{ margin-top:12px; }
   .pitch-svg{
     width:100%;

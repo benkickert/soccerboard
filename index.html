@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>11v11 Soccer Tactics Board</title>
+<style>
+  :root{
+    --bg: #0b0e10;
+    --panel: #11161b;
+    --panel-2:#0f1317;
+    --ink: #e7eef5;
+    --muted:#9fb0c3;
+    --pitch-green:#2e7d32;
+    --pitch-green-2:#318636;
+    --line:#f4f9ff;
+  }
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  }
+  .layout{
+    display:grid;
+    grid-template-columns: 320px 1fr 320px;
+    grid-template-rows: auto 1fr;
+    height:100vh;
+  }
+  header{
+    grid-column: 1 / -1;
+    padding:12px 16px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+    border-bottom:1px solid #182028;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  header h1{
+    font-size:20px;
+    margin:0; font-weight:700; letter-spacing:.2px;
+  }
+  .controls{
+    background:var(--panel);
+    border-right:1px solid #182028;
+    display:flex; flex-direction:column;
+  }
+  .controls.right{ border-right:none; border-left:1px solid #182028; }
+  .panel{ padding:14px 14px 12px; border-bottom:1px dashed #1c2530; }
+  .panel h2{ margin:0 0 10px; font-size:13px; font-weight:700; color:var(--muted); letter-spacing:.4px; text-transform:uppercase; }
+  /* Controls layout: widen the input column so selects = sliders */
+  .row{ display:grid; grid-template-columns: 1fr 220px; align-items:center; gap:10px; margin:8px 0; }
+  .row label{ color:var(--ink); font-weight:600; font-size:13px }
+
+  select, input[type="range"], button{
+    display:block;
+    width:100%;
+    background:var(--panel-2);
+    color:var(--ink);
+    border:1px solid #1c2530;
+    border-radius:8px;
+    padding:8px 10px;
+    outline:none;
+    box-sizing:border-box;
+  }
+  /* Range track/handle & ensure the right edge is visible */
+  input[type="range"]{
+    appearance:none; height:34px; padding:0; margin:0;
+  }
+  input[type="range"]::-webkit-slider-runnable-track{height:4px; background:#1a222b; border-radius:3px}
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; height:16px; width:16px; border-radius:50%;
+    background:#cfe5ff; border:2px solid #2a7bd6; margin-top:-6px; box-shadow:0 0 0 4px rgba(42,123,214,.15);
+  }
+
+  .buttons{ display:flex; gap:10px; padding:12px 14px; background:linear-gradient(0deg, rgba(255,255,255,0.03), transparent); border-top:1px solid #182028; }
+  button{ cursor:pointer; font-weight:700; }
+  .btn-accent{ background:#143b29; border-color:#1f6c4e }
+  .btn-danger{ background:#3a1515; border-color:#7a2b2b }
+  .canvas-wrap{ background:#0b0f0e; display:flex; align-items:center; justify-content:center; position:relative; }
+
+  /* Visibility panel */
+  .vis-panel h3{ margin:10px 0 8px; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.3px; }
+  .vis-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:6px 12px;
+    grid-auto-flow: column; /* fill down first column, then second */
+  }
+  .vis-item{ display:flex; align-items:center; gap:6px; }
+  .vis-item input[type="checkbox"]{ width:16px; height:16px; }
+  .vis-actions{ display:flex; gap:8px; margin-top:8px; }
+  .vis-actions button{ font-size:12px; padding:6px 8px; }
+
+  /* Instructions block */
+  .instructions{
+    margin-top:12px; padding:10px; border:1px dashed #20303d; border-radius:8px; background:#0d141a;
+    color:#bdc9d6; font-size:12.5px;
+  }
+  .instructions .title{
+    font-weight:700; color:#d6e2ef; margin-bottom:6px; text-transform:uppercase; letter-spacing:.3px; font-size:12px;
+  }
+  .instructions .line + .line{ margin-top:0.5em; } /* 0.5 line space between lines */
+
+  @media (max-width: 1100px){ .layout{grid-template-columns: 260px 1fr 260px;} .row{grid-template-columns:1fr 200px;} }
+  @media (max-width: 900px){
+    .layout{grid-template-columns: 1fr}
+    .controls.right{order:3} .controls{order:1} .canvas-wrap{order:2; min-height:60vh}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <header>
+    <h1>11v11 Soccer Tactics Board</h1>
+    <div class="buttons" style="padding:0; background:none; border:none">
+      <button id="btnResetDragged" class="btn-accent">Reset Dragged Items</button>
+      <button id="btnResetAll" class="btn-danger">Reset All (Kickoff)</button>
+    </div>
+  </header>
+
+  <!-- Home Team controls -->
+  <aside class="controls" id="leftControls">
+    <div class="panel">
+      <h2>Home Team</h2>
+      <div class="row">
+        <label for="leftColor">Color</label>
+        <select id="leftColor">
+          <option value="red">Red</option>
+          <option value="blue">Blue</option>
+          <option value="black">Black</option>
+          <option value="white">White</option>
+          <option value="yellow">Yellow</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="leftFormation">Formation</label>
+        <select id="leftFormation"></select>
+      </div>
+      <div class="row">
+        <label for="leftExpand">Depth Expansion</label>
+        <input type="range" id="leftExpand" min="0" max="1" step="0.001" value="0.5" />
+      </div>
+      <div class="row">
+        <label for="leftWidth">Width Expansion</label>
+        <input type="range" id="leftWidth" min="0" max="1" step="0.001" value="0.5" />
+      </div>
+      <div class="row" style="margin-top:12px">
+        <label for="leftPosition">Position</label>
+        <input type="range" id="leftPosition" min="0" max="1" step="0.001" value="0.5" />
+      </div>
+
+      <!-- Visibility -->
+      <div class="vis-panel">
+        <h3>Player Visibility</h3>
+        <div id="leftVisGrid" class="vis-grid"></div>
+        <div class="vis-actions">
+          <button id="leftShowAll">Show All</button>
+          <button id="leftHideAll">Hide All</button>
+        </div>
+      </div>
+
+      <!-- Instructions -->
+      <div class="instructions">
+        <div class="title">Instructions</div>
+        <div class="line">Select starting color and starting formation.</div>
+        <div class="line">Expand width and depth of outfield players.</div>
+        <div class="line">Adjust position of outfield players on pitch.</div>
+        <div class="line">Drag ball onto player to retain position. Double click to release possession.</div>
+        <div class="line">Double click player to turn off visibility.</div>
+        <div class="line">Reset dragged objects or reset to kick off.</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Canvas -->
+  <main class="canvas-wrap">
+    <!-- SVG in meters; margins: ±3m touchlines (Y), ±1m goal lines (X) -->
+    <svg id="pitch" viewBox="-1 -3 107 74" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%;">
+      <defs>
+        <pattern id="grass" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="scale(2)">
+          <rect width="10" height="10" fill="#2e7d32"></rect>
+          <rect y="0" width="10" height="5" fill="#318636" opacity=".35"></rect>
+        </pattern>
+        <filter id="drop" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0.5" stdDeviation="0.6" flood-color="black" flood-opacity="0.5"/>
+        </filter>
+      </defs>
+
+      <!-- Outside area visualization -->
+      <rect x="-1" y="-3" width="107" height="74" fill="#0f2d0f"></rect>
+
+      <!-- Pitch base (0..105 x, 0..68 y) -->
+      <g id="field">
+        <rect x="0" y="0" width="105" height="68" fill="url(#grass)" stroke="#f4f9ff" stroke-width="0.12"></rect>
+        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="#f4f9ff" stroke-width="0.12"></line>
+        <circle cx="52.5" cy="34" r="9.15" fill="none" stroke="#f4f9ff" stroke-width="0.12"></circle>
+        <circle cx="52.5" cy="34" r="0.2" fill="#f4f9ff"></circle>
+
+        <!-- Left penalty -->
+        <rect x="0" y="13.84" width="16.5" height="40.32" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
+        <rect x="0" y="24.84" width="5.5" height="18.32" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
+        <circle cx="11" cy="34" r="0.2" fill="#f4f9ff"></circle>
+        <path d="M 16.5 34 m 0 -9.15 a 9.15 9.15 0 0 1 0 18.3" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+
+        <!-- Right penalty -->
+        <rect x="88.5" y="13.84" width="16.5" height="40.32" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
+        <rect x="99.5" y="24.84" width="5.5" height="18.32" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
+        <circle cx="94" cy="34" r="0.2" fill="#f4f9ff"></circle>
+        <path d="M 88.5 34 m 0 -9.15 a 9.15 9.15 0 0 0 0 18.3" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+
+        <!-- Corners (1m) -->
+        <path d="M 0 1 a 1 1 0 0 1 1 -1" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+        <path d="M 0 67 a 1 1 0 0 0 1 1" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+        <path d="M 105 1 a 1 1 0 0 0 -1 -1" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+        <path d="M 105 67 a 1 1 0 0 1 -1 1" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+      </g>
+
+      <!-- Z‑order: Away (right) bottom, Home (left) above, Ball on top -->
+      <g id="teamRightLayer"></g>
+      <g id="teamLeftLayer"></g>
+      <g id="ballLayer"></g>
+    </svg>
+  </main>
+
+  <!-- Away Team controls -->
+  <aside class="controls right" id="rightControls">
+    <div class="panel">
+      <h2>Away Team</h2>
+      <div class="row">
+        <label for="rightColor">Color</label>
+        <select id="rightColor">
+          <option value="blue">Blue</option>
+          <option value="red">Red</option>
+          <option value="black">Black</option>
+          <option value="white">White</option>
+          <option value="yellow">Yellow</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="rightFormation">Formation</label>
+        <select id="rightFormation"></select>
+      </div>
+      <div class="row">
+        <label for="rightExpand">Depth Expansion</label>
+        <input type="range" id="rightExpand" min="0" max="1" step="0.001" value="0.5" />
+      </div>
+      <div class="row">
+        <label for="rightWidth">Width Expansion</label>
+        <input type="range" id="rightWidth" min="0" max="1" step="0.001" value="0.5" />
+      </div>
+      <div class="row" style="margin-top:12px">
+        <label for="rightPosition">Position</label>
+        <input type="range" id="rightPosition" min="0" max="1" step="0.001" value="0.5" />
+      </div>
+
+      <!-- Visibility -->
+      <div class="vis-panel">
+        <h3>Player Visibility</h3>
+        <div id="rightVisGrid" class="vis-grid"></div>
+        <div class="vis-actions">
+          <button id="rightShowAll">Show All</button>
+          <button id="rightHideAll">Hide All</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+/* ============================================================
+   11v11 Soccer Tactics Board (V4.3)
+   - Reset All: also re-shows hidden players (both teams), while still
+     preserving formation & colors.
+   - Removed duplicate explanatory text under Home sliders.
+   - Added "Instructions" label and 0.5-line spacing.
+   ============================================================ */
+
+const PITCH_LEN = 105;
+const PITCH_WID = 68;
+const GOAL_MARGIN = 1;   // ±1m horizontally
+const TOUCH_MARGIN = 3;  // ±3m vertically
+const MID_X = PITCH_LEN/2;           // 52.5
+const CIRCLE_R = 9.15;               // 10 yards
+const GK_X_LEFT  = 6;
+const GK_X_RIGHT = PITCH_LEN - GK_X_LEFT;
+
+const COLOR_MAP = {
+  blue:   {fill:'#1e88e5'},
+  red:    {fill:'#e53935'},
+  black:  {fill:'#212121'},
+  white:  {fill:'#ffffff'},
+  yellow: {fill:'#ffeb3b'}
+};
+function textColorFor(hex){
+  const c = hex.replace('#','');
+  const r = parseInt(c.slice(0,2),16)/255;
+  const g = parseInt(c.slice(2,4),16)/255;
+  const b = parseInt(c.slice(4,6),16)/255;
+  const l = 0.2126*r + 0.7152*g + 0.0722*b;
+  return (l>0.6) ? '#111' : '#fff';
+}
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function clampX(x){ return clamp(x, -GOAL_MARGIN, PITCH_LEN + GOAL_MARGIN); }
+function clampY(y){ return clamp(y, -TOUCH_MARGIN, PITCH_WID + TOUCH_MARGIN); }
+function lerp(a,b,t){ return a + (b-a)*t; }
+
+/* ---------- Base lateral anchors (Y in [0,1]) ---------- */
+const Y = {
+  VERY_WIDE_TOP: 0.14, VERY_WIDE_BOT: 0.86,
+  WIDE_TOP: 0.18,      WIDE_BOT: 0.82,
+  EQ1: 0.16, EQ2: 0.38, EQ3: 0.62, EQ4: 0.84,
+  MID_TOP: 0.28, MID_BOT: 0.72,
+  CENTRE: 0.50
+};
+
+/* ---------- Formation templates ---------- */
+const FORMATIONS = {
+  '4-4-2 (Flat)': [
+    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+    {label:'LB',  sideId:'LB',  t:0.00, y:Y.EQ1},
+    {label:'LCB', sideId:'LCB', t:0.00, y:Y.EQ2},
+    {label:'RCB', sideId:'RCB', t:0.00, y:Y.EQ3},
+    {label:'RB',  sideId:'RB',  t:0.00, y:Y.EQ4},
+    {label:'LW',  sideId:'LW',  t:0.50, y:Y.EQ1},
+    {label:'LCM', sideId:'LCM', t:0.50, y:Y.EQ2},
+    {label:'RCM', sideId:'RCM', t:0.50, y:Y.EQ3},
+    {label:'RW',  sideId:'RW',  t:0.50, y:Y.EQ4},
+    {label:'ST',  sideId:'ST1', t:1.00, y:0.32},
+    {label:'ST',  sideId:'ST2', t:1.00, y:0.68},
+  ],
+  '4-4-2 (Diamond)': [
+    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+    {label:'LB',  sideId:'LB',  t:0.00, y:Y.EQ1},
+    {label:'LCB', sideId:'LCB', t:0.00, y:Y.EQ2},
+    {label:'RCB', sideId:'RCB', t:0.00, y:Y.EQ3},
+    {label:'RB',  sideId:'RB',  t:0.00, y:Y.EQ4},
+    {label:'CDM', sideId:'CDM', t:0.30, y:Y.CENTRE},
+    {label:'LCM', sideId:'LCM', t:0.50, y:0.38},
+    {label:'RCM', sideId:'RCM', t:0.50, y:0.62},
+    {label:'CAM', sideId:'CAM', t:0.70, y:Y.CENTRE},
+    {label:'ST',  sideId:'ST1', t:1.00, y:0.30},
+    {label:'ST',  sideId:'ST2', t:1.00, y:0.70},
+  ],
+  '4-3-3': [
+    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+    {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
+    {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
+    {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
+    {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
+    {label:'LM',  sideId:'LM',  t:0.52, y:Y.MID_TOP},
+    {label:'CM',  sideId:'CM',  t:0.55, y:Y.CENTRE},
+    {label:'RM',  sideId:'RM',  t:0.52, y:Y.MID_BOT},
+    {label:'LW',  sideId:'LW',  t:1.00, y:0.28},
+    {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
+    {label:'RW',  sideId:'RW',  t:1.00, y:0.72},
+  ],
+  '4-2-3-1': [
+    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+    {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
+    {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
+    {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
+    {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
+    {label:'CDM', sideId:'LCDM',t:0.35, y:0.44},
+    {label:'CDM', sideId:'RCDM',t:0.35, y:0.56},
+    {label:'LW',  sideId:'LW',  t:0.72, y:0.26},
+    {label:'CAM', sideId:'CAM', t:0.80, y:Y.CENTRE},
+    {label:'RW',  sideId:'RW',  t:0.72, y:0.74},
+    {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
+  ],
+  '3-5-2': [
+    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+    {label:'LCB', sideId:'LCB', t:0.00, y:0.38},
+    {label:'CB',  sideId:'CB',  t:0.00, y:Y.CENTRE},
+    {label:'RCB', sideId:'RCB', t:0.00, y:0.62},
+    {label:'LWB', sideId:'LWB', t:0.45, y:Y.WIDE_TOP},
+    {label:'RWB', sideId:'RWB', t:0.45, y:Y.WIDE_BOT},
+    {label:'LCM', sideId:'LCM', t:0.60, y:0.40},
+    {label:'CM',  sideId:'CM',  t:0.65, y:Y.CENTRE},
+    {label:'RCM', sideId:'RCM', t:0.60, y:0.60},
+    {label:'ST',  sideId:'ST1', t:1.00, y:0.32},
+    {label:'ST',  sideId:'ST2', t:1.00, y:0.68},
+  ],
+  '3-4-3 (Flat)': [
+    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+    {label:'LCB', sideId:'LCB', t:0.00, y:0.38},
+    {label:'CB',  sideId:'CB',  t:0.00, y:Y.CENTRE},
+    {label:'RCB', sideId:'RCB', t:0.00, y:0.62},
+    {label:'LWB', sideId:'LWB', t:0.50, y:Y.WIDE_TOP},
+    {label:'LCM', sideId:'LCM', t:0.50, y:0.44},
+    {label:'RCM', sideId:'RCM', t:0.50, y:0.56},
+    {label:'RWB', sideId:'RWB', t:0.50, y:Y.WIDE_BOT},
+    {label:'LW',  sideId:'LW',  t:1.00, y:0.28},
+    {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
+    {label:'RW',  sideId:'RW',  t:1.00, y:0.72},
+  ],
+  '3-4-3 (Diamond)': [
+    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+    {label:'LCB', sideId:'LCB', t:0.00, y:0.38},
+    {label:'CB',  sideId:'CB',  t:0.00, y:Y.CENTRE},
+    {label:'RCB', sideId:'RCB', t:0.00, y:0.62},
+    {label:'CDM', sideId:'CDM', t:0.35, y:Y.CENTRE},
+    {label:'LCM', sideId:'LCM', t:0.50, y:0.48},
+    {label:'RCM', sideId:'RCM', t:0.50, y:0.52},
+    {label:'CAM', sideId:'CAM', t:0.70, y:Y.CENTRE},
+    {label:'LW',  sideId:'LW',  t:1.00, y:0.14},
+    {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
+    {label:'RW',  sideId:'RW',  t:1.00, y:0.86},
+  ],
+  '4-1-3-2': [
+    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+    {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
+    {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
+    {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
+    {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
+    {label:'CDM', sideId:'CDM', t:0.30, y:Y.CENTRE},
+    {label:'LM',  sideId:'LM',  t:0.60, y:0.28},
+    {label:'CAM', sideId:'CAM', t:0.70, y:Y.CENTRE},
+    {label:'RM',  sideId:'RM',  t:0.60, y:0.72},
+    {label:'ST',  sideId:'ST1', t:1.00, y:0.46},
+    {label:'ST',  sideId:'ST2', t:1.00, y:0.54},
+  ],
+  '4-3-2-1': [
+    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+    {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
+    {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
+    {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
+    {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
+    {label:'LCM', sideId:'LCM', t:0.48, y:0.36},
+    {label:'CDM', sideId:'CDM', t:0.36, y:Y.CENTRE},
+    {label:'RCM', sideId:'RCM', t:0.48, y:0.64},
+    {label:'LAM', sideId:'LAM', t:0.70, y:0.46},
+    {label:'RAM', sideId:'RAM', t:0.70, y:0.54},
+    {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
+  ],
+};
+
+/* ---------- Role grouping for visibility ordering ---------- */
+const GROUPS = {
+  GK: new Set(['GK']),
+  BACK: new Set(['LB','LCB','CB','RCB','RB','LWB','RWB']),
+  MID: new Set(['CDM','CM','LCM','RCM','CAM','LM','RM','LAM','RAM']),
+  FWD: new Set(['LW','RW','ST','CF'])
+};
+function groupIndexForRole(role){
+  if(GROUPS.GK.has(role))  return 0;
+  if(GROUPS.BACK.has(role))return 1;
+  if(GROUPS.MID.has(role)) return 2;
+  if(GROUPS.FWD.has(role)) return 3;
+  return 4;
+}
+
+/* ---------- Team model ---------- */
+class Team {
+  constructor(opts){
+    this.id = opts.id;                // 'left' | 'right'
+    this.attack = opts.attack;        // +1 (right) | -1 (left)
+    this.layer = opts.layer;
+    this.colorKey = opts.colorKey;
+    this.color = COLOR_MAP[this.colorKey].fill;
+    this.textColor = textColorFor(this.color);
+    this.formationKey = opts.formationKey;
+
+    this.depthVal = 0.5;              // [0,1]
+    this.widthVal = 0.5;              // [0,1]
+    this.positionVal = 0.5;           // [0,1] (Away mirrored in mapping)
+    this.anchorU = 25;                // last defender anchor from own goal line
+    this.gkX = (this.attack===+1) ? GK_X_LEFT : GK_X_RIGHT;
+
+    this.players = [];
+    this.visUI = {grid: null, showAllBtn:null, hideAllBtn:null, cbMap:{}};
+    this.buildPlayers();
+  }
+
+  setColor(key){
+    this.colorKey = key;
+    this.color = COLOR_MAP[key].fill;
+    this.textColor = textColorFor(this.color);
+    for(const p of this.players){
+      p.circ.setAttribute('fill', this.color);
+      p.text.setAttribute('fill', this.textColor);
+    }
+  }
+  setFormation(key){
+    this.formationKey = key;
+    this.buildPlayers();
+    this.updatePositions();
+    if(this.visUI.grid){
+      this.players.forEach(p=>{ p.visible = true; });
+      this.rebuildVisibilityUI();
+    }
+  }
+
+  uToX(u){ return (this.attack===+1) ? u : (PITCH_LEN - u); }
+
+  spanForDepth(e){
+    const toHalf = MID_X - this.anchorU;
+    const toGoal = PITCH_LEN - this.anchorU;
+    if(e <= 0.5) return 2*e*toHalf;
+    return toHalf + 2*(e-0.5)*(toGoal - toHalf);
+  }
+  deltaRange(span){
+    return {min: -this.anchorU, max: PITCH_LEN - (this.anchorU + span)};
+  }
+  deltaUForPosition(p, span){
+    const {min, max} = this.deltaRange(span);
+    const t = (this.attack===+1) ? p : (1 - p); // mirror for Away
+    return lerp(min, max, t);
+  }
+
+  widthScale(w){
+    if(w <= 0.5) return w/0.5;              // [0..1]
+    return 1 + ((w-0.5)/0.5) * 0.3;         // (1..1.3]
+  }
+
+  computeFontSize(label){
+    const n = label.length;
+    if(n <= 2) return 1.45;
+    if(n === 3) return 1.20;
+    return 1.10;
+  }
+
+  buildPlayers(){
+    while(this.layer.firstChild) this.layer.removeChild(this.layer.firstChild);
+    this.players = [];
+    const roles = FORMATIONS[this.formationKey];
+    const team = this;
+
+    for(const r of roles){
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      const circ = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      const txt  = document.createElementNS('http://www.w3.org/2000/svg','text');
+      circ.setAttribute('r', 1.9);
+      circ.setAttribute('fill', this.color);
+      circ.setAttribute('stroke', '#000');
+      circ.setAttribute('stroke-width','0.18');
+      circ.style.cursor = 'grab';
+      txt.setAttribute('font-size', String(this.computeFontSize(r.label)));
+      txt.setAttribute('font-weight','800');
+      txt.setAttribute('text-anchor','middle');
+      txt.setAttribute('dominant-baseline','central');
+      txt.setAttribute('fill', this.textColor);
+      txt.textContent = r.label;
+
+      g.appendChild(circ);
+      g.appendChild(txt);
+      this.layer.appendChild(g);
+
+      const p = {
+        team: this,
+        role: r.label, sideId: r.sideId, t: r.t, yNorm: r.y,
+        g, circ, text: txt,
+        x: 0, y: 0,
+        dragDX: 0, dragDY: 0,
+        dragged: false,
+        hasBall: false,
+        visible: true
+      };
+      this.attachDragHandlers(p);
+      // Dblclick: if has ball → detach & drop aside; else → hide player
+      g.addEventListener('dblclick', ()=>{
+        if(p.hasBall && ball.attachedTo === p){
+          detachBallWithSideDrop(p);
+        }else{
+          team.setPlayerVisibility(p, false);
+        }
+      });
+      this.players.push(p);
+    }
+  }
+
+  computeLayout(){
+    const span = this.spanForDepth(this.depthVal);
+    const deltaU = this.deltaUForPosition(this.positionVal, span);
+    const s = this.widthScale(this.widthVal);
+
+    const pts = [];
+    for(const pl of this.players){
+      let x, y;
+      if(pl.t === null){
+        x = this.gkX;
+        y = clampY(pl.yNorm * PITCH_WID);
+      } else {
+        const u = this.anchorU + pl.t * span + deltaU;
+        x = this.uToX(clamp(u, 0, PITCH_LEN));   // base layout stays within the lines
+        const yNorm = 0.5 + (pl.yNorm - 0.5) * s;
+        y = clampY(yNorm * PITCH_WID);
+      }
+      pts.push({pl, x, y});
+    }
+    return pts;
+  }
+
+  updatePositions(){
+    const layout = this.computeLayout();
+    for(const item of layout){
+      const pl = item.pl;
+      if(!pl.visible){ pl.g.style.display='none'; continue; }
+      pl.g.style.display='block';
+
+      const x = item.x + pl.dragDX;
+      const y = item.y + pl.dragDY;
+      pl.x = clampX(x);
+      pl.y = clampY(y);
+      pl.circ.setAttribute('cx', pl.x);
+      pl.circ.setAttribute('cy', pl.y);
+      pl.text.setAttribute('x', pl.x);
+      pl.text.setAttribute('y', pl.y + 0.03);
+
+      if(pl.hasBall && ball.attachedTo === pl){
+        positionBallAtPlayer(pl);
+      }
+    }
+  }
+
+  setPlayerVisibility(pl, vis){
+    pl.visible = !!vis;
+    pl.g.style.display = vis ? 'block' : 'none';
+    if(!vis && pl.hasBall) detachBall();
+    const cb = this.visUI.cbMap[pl.sideId];
+    if(cb) cb.checked = vis;
+  }
+
+  showAllPlayers(){ for(const p of this.players) this.setPlayerVisibility(p, true); }
+  hideAllPlayers(){ for(const p of this.players) this.setPlayerVisibility(p, false); }
+
+  attachDragHandlers(pl){
+    const onDown = (ev)=>{
+      ev.preventDefault();
+      pl.g.setPointerCapture(ev.pointerId);
+      pl.g.style.cursor = 'grabbing';
+      let start = svgPointFromEvent(ev);
+      const startDX = pl.dragDX, startDY = pl.dragDY;
+      const move = (e)=>{
+        const pt = svgPointFromEvent(e);
+        pl.dragDX = startDX + (pt.x - start.x);
+        pl.dragDY = startDY + (pt.y - start.y);
+        const layout = this.computeLayout().find(it=>it.pl===pl);
+        let nx = clampX(layout.x + pl.dragDX);
+        let ny = clampY(layout.y + pl.dragDY);
+        pl.dragDX = nx - layout.x;
+        pl.dragDY = ny - layout.y;
+        pl.dragged = true;
+        this.updatePositions();
+      };
+      const up = (e)=>{
+        pl.g.releasePointerCapture(e.pointerId);
+        pl.g.style.cursor = 'grab';
+        document.removeEventListener('pointermove', move);
+        document.removeEventListener('pointerup', up);
+        const dx = pl.x - ball.x, dy = pl.y - ball.y;
+        if(dx*dx + dy*dy <= (1.9*1.9)) attachBall(pl);
+        if(pl.hasBall && ball.attachedTo === pl) positionBallAtPlayer(pl);
+      };
+      document.addEventListener('pointermove', move);
+      document.addEventListener('pointerup', up);
+    };
+    pl.g.addEventListener('pointerdown', onDown);
+  }
+
+  /* ----- Visibility UI ----- */
+  connectVisibilityUI(gridEl, showAllBtn, hideAllBtn){
+    this.visUI = {grid: gridEl, showAllBtn, hideAllBtn, cbMap:{}};
+    this.rebuildVisibilityUI();
+    showAllBtn.addEventListener('click', ()=> this.showAllPlayers());
+    hideAllBtn.addEventListener('click', ()=> this.hideAllPlayers());
+  }
+
+  rebuildVisibilityUI(){
+    const grid = this.visUI.grid;
+    if(!grid) return;
+    grid.innerHTML = '';
+    this.visUI.cbMap = {};
+
+    // Order: GK; backs L➜R; mids L➜R; forwards L➜R
+    const ordered = this.players.slice().sort((a,b)=>{
+      const ga = groupIndexForRole(a.role), gb = groupIndexForRole(b.role);
+      if(ga !== gb) return ga - gb;
+      if(a.yNorm !== b.yNorm) return a.yNorm - b.yNorm;
+      return a.role.localeCompare(b.role);
+    });
+
+    // Column-major fill: set rows then append in order
+    const rows = Math.ceil(ordered.length / 2);
+    grid.style.gridTemplateRows = `repeat(${rows}, auto)`;
+
+    const labelCounts = {};
+    for(const p of ordered){
+      const label = p.role;
+      labelCounts[label] = (labelCounts[label]||0) + 1;
+      const suffix = (labelCounts[label] > 1) ? ` (${labelCounts[label]})` : '';
+      const id = `${this.id}-vis-${p.sideId}`;
+
+      const item = document.createElement('div');
+      item.className = 'vis-item';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.id = id;
+      cb.checked = p.visible;
+      cb.dataset.sideId = p.sideId;
+      const lab = document.createElement('label');
+      lab.setAttribute('for', id);
+      lab.textContent = label + suffix;
+
+      cb.addEventListener('change', (e)=> this.setPlayerVisibility(p, e.target.checked));
+
+      item.appendChild(cb);
+      item.appendChild(lab);
+      grid.appendChild(item);
+      this.visUI.cbMap[p.sideId] = cb;
+    }
+  }
+
+  resetDraggedToSliders(){
+    for(const pl of this.players){
+      if(pl.dragged){ pl.dragDX=0; pl.dragDY=0; pl.dragged=false; }
+    }
+    this.updatePositions();
+  }
+
+  resetPosExpToKickoffOnly(){
+    // Reset pos/exp + drags; preserve formation & color
+    for(const pl of this.players){ pl.dragDX=0; pl.dragDY=0; pl.dragged=false; }
+    this.depthVal = 0.5;
+    this.widthVal = 0.5;
+    this.positionVal = 0.5;
+    this.anchorU = 25;
+    this.updatePositions();
+  }
+}
+
+/* ---------- Ball ---------- */
+const ball = {
+  layer: document.getElementById('ballLayer'),
+  g:null, circ:null, halo:null,
+  x: MID_X, y: PITCH_WID/2, r: 1.1,
+  attachedTo: null,
+  haloActive: true,
+  draggedOnce: false
+};
+function buildBall(){
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  const halo = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  halo.setAttribute('r', ball.r + 0.45);
+  halo.setAttribute('fill', 'none');
+  halo.setAttribute('stroke', '#ffb300');
+  halo.setAttribute('stroke-width', '0.20');
+  halo.setAttribute('opacity', '0.85');
+  halo.style.pointerEvents = 'none';
+
+  const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  c.setAttribute('r', ball.r);
+  c.setAttribute('fill', '#ffffff');
+  c.setAttribute('stroke', '#111111');
+  c.setAttribute('stroke-width','0.35');
+  c.setAttribute('filter','url(#drop)');
+  c.style.cursor='grab';
+
+  g.appendChild(halo);
+  g.appendChild(c);
+  ball.layer.appendChild(g);
+  ball.g=g; ball.circ=c; ball.halo=halo;
+  positionBall(ball.x, ball.y);
+  setBallHaloVisible(true);
+
+  const onDown = (ev)=>{
+    ev.preventDefault();
+    g.setPointerCapture(ev.pointerId);
+    g.style.cursor='grabbing';
+    const start = svgPointFromEvent(ev);
+    const sx=ball.x, sy=ball.y;
+    let moved = false;
+
+    const move = (e)=>{
+      const pt = svgPointFromEvent(e);
+      let nx = clampX(sx + (pt.x-start.x));
+      let ny = clampY(sy + (pt.y-start.y));
+      if(Math.hypot(nx - sx, ny - sy) > 0.2) moved = true;
+      positionBall(nx, ny);
+      if(ball.attachedTo) detachBall();
+    };
+    const up = (e)=>{
+      g.releasePointerCapture(e.pointerId);
+      g.style.cursor='grab';
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      const hit = hitTestPlayers(ball.x, ball.y);
+      if(hit) attachBall(hit);
+      if(moved && !ball.draggedOnce){
+        ball.draggedOnce = true;
+        setBallHaloVisible(false);
+      }
+    };
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  };
+  g.addEventListener('pointerdown', onDown);
+  g.addEventListener('dblclick', ()=> detachBall());
+}
+function setBallHaloVisible(on){
+  ball.haloActive = on;
+  ball.halo.style.display = on ? 'block' : 'none';
+}
+function positionBall(x,y){
+  ball.x = clampX(x);
+  ball.y = clampY(y);
+  ball.circ.setAttribute('cx', ball.x);
+  ball.circ.setAttribute('cy', ball.y);
+  ball.halo.setAttribute('cx', ball.x);
+  ball.halo.setAttribute('cy', ball.y);
+}
+function attackSideOffsetFor(team){ return (team.attack===+1) ? +2.3 : -2.3; }
+function safeDropOffsetFor(team){
+  const playerR = 1.9, ballR = 1.1, margin = 0.25;
+  const dist = playerR + ballR + margin; // 3.25m
+  return (team.attack===+1) ? +dist : -dist;
+}
+function positionBallAtPlayer(pl){ positionBall(pl.x + attackSideOffsetFor(pl.team), pl.y); }
+function attachBall(pl){ detachBall(); ball.attachedTo = pl; pl.hasBall=true; positionBallAtPlayer(pl); }
+function detachBall(){
+  if(ball.attachedTo){
+    ball.attachedTo.hasBall = false;
+    ball.attachedTo = null;
+  }
+}
+function detachBallWithSideDrop(pl){
+  if(ball.attachedTo === pl){
+    pl.hasBall = false;
+    ball.attachedTo = null;
+    positionBall(pl.x + safeDropOffsetFor(pl.team), pl.y);
+  }
+}
+function hitTestPlayers(x,y){
+  const all = teams.left.players.concat(teams.right.players);
+  for(const p of all){
+    if(!p.visible) continue;
+    const dx = p.x - x, dy = p.y - y;
+    if(dx*dx + dy*dy <= (1.9*1.9)) return p;
+  }
+  return null;
+}
+
+/* ---------- SVG helpers ---------- */
+const svg = document.getElementById('pitch');
+function svgPointFromEvent(ev){
+  const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+/* ---------- App state ---------- */
+const layers = { left: document.getElementById('teamLeftLayer'), right: document.getElementById('teamRightLayer') };
+const teams = {
+  left:  new Team({id:'left',  attack:+1, layer: layers.left,  colorKey:'red',  formationKey:'4-3-3'}), // Home = Red
+  right: new Team({id:'right', attack:-1, layer: layers.right, colorKey:'blue', formationKey:'4-3-3'})  // Away = Blue
+};
+buildBall();
+
+/* ---------- Controls ---------- */
+const leftFormationSel  = document.getElementById('leftFormation');
+const rightFormationSel = document.getElementById('rightFormation');
+const leftColorSel      = document.getElementById('leftColor');
+const rightColorSel     = document.getElementById('rightColor');
+const leftExpand        = document.getElementById('leftExpand');
+const rightExpand       = document.getElementById('rightExpand');
+const leftWidth         = document.getElementById('leftWidth');
+const rightWidth        = document.getElementById('rightWidth');
+const leftPosition      = document.getElementById('leftPosition');
+const rightPosition     = document.getElementById('rightPosition');
+const btnResetDragged   = document.getElementById('btnResetDragged');
+const btnResetAll       = document.getElementById('btnResetAll');
+
+const leftVisGrid  = document.getElementById('leftVisGrid');
+const rightVisGrid = document.getElementById('rightVisGrid');
+const leftShowAll  = document.getElementById('leftShowAll');
+const leftHideAll  = document.getElementById('leftHideAll');
+const rightShowAll = document.getElementById('rightShowAll');
+const rightHideAll = document.getElementById('rightHideAll');
+
+function populateFormationOptions(){
+  const keys = Object.keys(FORMATIONS);
+  for(const k of keys){
+    const o1 = document.createElement('option'); o1.value=k; o1.textContent=k; leftFormationSel.appendChild(o1);
+    const o2 = document.createElement('option'); o2.value=k; o2.textContent=k; rightFormationSel.appendChild(o2);
+  }
+  leftFormationSel.value = teams.left.formationKey;
+  rightFormationSel.value = teams.right.formationKey;
+}
+populateFormationOptions();
+
+function initControls(){
+  // Colors
+  leftColorSel.value = teams.left.colorKey;
+  rightColorSel.value = teams.right.colorKey;
+  leftColorSel.addEventListener('change', e=>{ teams.left.setColor(e.target.value); });
+  rightColorSel.addEventListener('change', e=>{ teams.right.setColor(e.target.value); });
+
+  // Formations
+  leftFormationSel.addEventListener('change', e=>{ teams.left.setFormation(e.target.value); });
+  rightFormationSel.addEventListener('change', e=>{ teams.right.setFormation(e.target.value); });
+
+  // Sliders
+  leftExpand.addEventListener('input', e=>{ teams.left.depthVal = parseFloat(e.target.value); teams.left.updatePositions(); });
+  rightExpand.addEventListener('input', e=>{ teams.right.depthVal = parseFloat(e.target.value); teams.right.updatePositions(); });
+
+  leftWidth.addEventListener('input', e=>{ teams.left.widthVal = parseFloat(e.target.value); teams.left.updatePositions(); });
+  rightWidth.addEventListener('input', e=>{ teams.right.widthVal = parseFloat(e.target.value); teams.right.updatePositions(); });
+
+  leftPosition.addEventListener('input', e=>{ teams.left.positionVal = parseFloat(e.target.value); teams.left.updatePositions(); });
+  rightPosition.addEventListener('input', e=>{ teams.right.positionVal = parseFloat(e.target.value); teams.right.updatePositions(); });
+
+  // Visibility UIs
+  teams.left.connectVisibilityUI(leftVisGrid, leftShowAll, leftHideAll);
+  teams.right.connectVisibilityUI(rightVisGrid, rightShowAll, rightHideAll);
+
+  // Resets
+  btnResetDragged.addEventListener('click', ()=>{
+    teams.left.resetDraggedToSliders();
+    teams.right.resetDraggedToSliders();
+  });
+  btnResetAll.addEventListener('click', ()=> resetAllToKickoff() );
+}
+initControls();
+
+/* ---------- Kickoff layout helpers ---------- */
+function setPositionForFrontlineAtCircleEdge(team, posSliderEl){
+  const targetX = (team.attack===+1) ? (MID_X - CIRCLE_R) : (MID_X + CIRCLE_R);
+  const span = team.spanForDepth(team.depthVal);
+  const {min, max} = team.deltaRange(span);
+  const uFrontTarget = (team.attack===+1) ? targetX : (PITCH_LEN - targetX);
+  const desiredDelta = clamp(uFrontTarget - (team.anchorU + span), min, max);
+  const t = (desiredDelta - min) / (max - min);
+  const p = (team.attack===+1) ? t : (1 - t);
+  team.positionVal = clamp(p, 0, 1);
+  posSliderEl.value = String(team.positionVal);
+  team.updatePositions();
+}
+
+/* ---------- Reset All: pos/exp + drags + ball; ALSO re-show hidden players ---------- */
+function resetAllToKickoff(){
+  // Reset pos/exp & drag offsets
+  teams.left.resetPosExpToKickoffOnly();
+  teams.right.resetPosExpToKickoffOnly();
+
+  leftExpand.value = rightExpand.value = 0.5;
+  leftWidth.value  = rightWidth.value  = 0.5;
+  leftPosition.value = rightPosition.value = 0.5;
+
+  // Ball back to center; halo visible again
+  detachBall(); positionBall(MID_X, PITCH_WID/2);
+  ball.draggedOnce = false; setBallHaloVisible(true);
+
+  // Front lines to edge of center circle for both teams
+  setPositionForFrontlineAtCircleEdge(teams.left, leftPosition);
+  setPositionForFrontlineAtCircleEdge(teams.right, rightPosition);
+
+  // Re-show ALL players & sync checkboxes
+  teams.left.showAllPlayers();
+  teams.right.showAllPlayers();
+  if(teams.left.visUI.grid)  teams.left.rebuildVisibilityUI();
+  if(teams.right.visUI.grid) teams.right.rebuildVisibilityUI();
+}
+resetAllToKickoff();
+
+window.addEventListener('resize', ()=>{/* SVG viewBox handles scaling */});
+</script>
+</body>
+</html>

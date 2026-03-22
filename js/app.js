@@ -682,6 +682,9 @@ const btnResetAll       = document.getElementById('btnResetAll');
 const focusModeToggle   = document.getElementById('focusModeToggle');
 const instructionsPanel = document.getElementById('instructionsPanel');
 const btnCloseInstructions = document.getElementById('btnCloseInstructions');
+const licenseModal = document.getElementById('licenseModal');
+const licenseInfoButton = document.getElementById('licenseInfoButton');
+const closeLicenseModal = document.getElementById('closeLicenseModal');
 
 const leftVisGrid  = document.getElementById('leftVisGrid');
 const rightVisGrid = document.getElementById('rightVisGrid');
@@ -699,20 +702,41 @@ if(btnCloseInstructions){
   btnCloseInstructions.addEventListener('click', ()=> setInstructionsVisible(false));
 }
 
+function setLicenseModalVisible(visible){
+  if(!licenseModal) return;
+  licenseModal.hidden = !visible;
+  document.body.classList.toggle('modal-open', visible);
+  if(visible){
+    closeLicenseModal?.focus();
+  }else{
+    licenseInfoButton?.focus();
+  }
+}
+if(licenseInfoButton && licenseModal){
+  licenseInfoButton.addEventListener('click', ()=> setLicenseModalVisible(true));
+}
+if(closeLicenseModal){
+  closeLicenseModal.addEventListener('click', ()=> setLicenseModalVisible(false));
+}
+if(licenseModal){
+  licenseModal.addEventListener('click', (event)=>{
+    if(event.target === licenseModal) setLicenseModalVisible(false);
+  });
+}
+document.addEventListener('keydown', (event)=>{
+  if(event.key === 'Escape' && licenseModal && !licenseModal.hidden){
+    setLicenseModalVisible(false);
+  }
+});
+
 function setFocusMode(on){
   const controlsVisible = !!on;
   document.body.classList.toggle('focus-mode', !controlsVisible);
   if(focusModeToggle) focusModeToggle.checked = controlsVisible;
-  try { localStorage.setItem('controlsVisible', controlsVisible ? '1' : '0'); } catch(_) {}
   updatePitchOrientation();
 }
 if(focusModeToggle){
-  let controlsVisible = true; // default ON = controls visible
-  try {
-    const saved = localStorage.getItem('controlsVisible');
-    if(saved !== null) controlsVisible = (saved === '1');
-  } catch(_) {}
-  setFocusMode(controlsVisible);
+  setFocusMode(true);
   focusModeToggle.addEventListener('change', e=> setFocusMode(e.target.checked));
 }
 

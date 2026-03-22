@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>11v11 Soccer Tactics Board</title>
-<link rel="stylesheet" href="css/styles.css?v=1.0.1" />
+<link rel="stylesheet" href="css/styles.css?v=1.0.2" />
 </head>
 <body>
 <div class="layout">
@@ -74,7 +74,15 @@
         <div class="line">Drag ball onto player to retain position. Double click to release possession.</div>
         <div class="line">Double click player to turn off visibility.</div>
         <div class="line">Use Reset Positions or Reset to Kickoff as needed.</div>
-        <div class="instructions-version">v1.0.1</div>
+        <button
+          class="instructions-meta"
+          id="licenseInfoButton"
+          type="button"
+          aria-haspopup="dialog"
+          aria-controls="licenseModal"
+        >
+          Copyright Ben Kickert | v1.0.2
+        </button>
       </div>
     </div>
   </aside>
@@ -172,7 +180,26 @@
   </aside>
 </div>
 
-<script src="js/app.js?v=1.0.1"></script>
+<div class="modal-backdrop" id="licenseModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="licenseModalTitle">
+    <div class="modal-head">
+      <h2 id="licenseModalTitle">License Information</h2>
+      <button id="closeLicenseModal" class="modal-close" type="button" aria-label="Close license information">X</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>Soccerboard</strong> is Copyright Ben Kickert.</p>
+      <p>Version: <strong>v1.0.2</strong></p>
+      <p>Licensed under <strong>PolyForm Noncommercial 1.0.0</strong>.</p>
+      <p>Use and modification are allowed for noncommercial purposes. Attribution notices must be preserved. Commercial use or resale is not permitted under this license.</p>
+      <p><a href="LICENSE" target="_blank" rel="noopener noreferrer">View local license file</a></p>
+      <p><a href="NOTICE" target="_blank" rel="noopener noreferrer">View required notice file</a></p>
+      <p><a href="https://polyformproject.org/licenses/noncommercial/1.0.0/" target="_blank" rel="noopener noreferrer">View official PolyForm license text</a></p>
+      <p><a href="https://github.com/benkickert/soccerboard" target="_blank" rel="noopener noreferrer">Project repository</a></p>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js?v=1.0.2"></script>
 </body>
 </html>
 

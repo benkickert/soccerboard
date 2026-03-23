@@ -782,6 +782,9 @@ const btnResetAll       = document.getElementById('btnResetAll');
 const focusModeToggle   = document.getElementById('focusModeToggle');
 const instructionsPanel = document.getElementById('instructionsPanel');
 const btnCloseInstructions = document.getElementById('btnCloseInstructions');
+const privacyModal = document.getElementById('privacyModal');
+const privacyInfoButton = document.getElementById('privacyInfoButton');
+const closePrivacyModal = document.getElementById('closePrivacyModal');
 const licenseModal = document.getElementById('licenseModal');
 const licenseInfoButton = document.getElementById('licenseInfoButton');
 const closeLicenseModal = document.getElementById('closeLicenseModal');
@@ -802,15 +805,32 @@ if(btnCloseInstructions){
   btnCloseInstructions.addEventListener('click', ()=> setInstructionsVisible(false));
 }
 
-function setLicenseModalVisible(visible){
-  if(!licenseModal) return;
-  licenseModal.hidden = !visible;
+function setModalVisible(modalEl, visible, triggerEl, closeEl){
+  if(!modalEl) return;
+  modalEl.hidden = !visible;
   document.body.classList.toggle('modal-open', visible);
   if(visible){
-    closeLicenseModal?.focus();
+    closeEl?.focus();
   }else{
-    licenseInfoButton?.focus();
+    triggerEl?.focus();
   }
+}
+function setPrivacyModalVisible(visible){
+  setModalVisible(privacyModal, visible, privacyInfoButton, closePrivacyModal);
+}
+function setLicenseModalVisible(visible){
+  setModalVisible(licenseModal, visible, licenseInfoButton, closeLicenseModal);
+}
+if(privacyInfoButton && privacyModal){
+  privacyInfoButton.addEventListener('click', ()=> setPrivacyModalVisible(true));
+}
+if(closePrivacyModal){
+  closePrivacyModal.addEventListener('click', ()=> setPrivacyModalVisible(false));
+}
+if(privacyModal){
+  privacyModal.addEventListener('click', (event)=>{
+    if(event.target === privacyModal) setPrivacyModalVisible(false);
+  });
 }
 if(licenseInfoButton && licenseModal){
   licenseInfoButton.addEventListener('click', ()=> setLicenseModalVisible(true));
@@ -824,7 +844,12 @@ if(licenseModal){
   });
 }
 document.addEventListener('keydown', (event)=>{
-  if(event.key === 'Escape' && licenseModal && !licenseModal.hidden){
+  if(event.key !== 'Escape') return;
+  if(privacyModal && !privacyModal.hidden){
+    setPrivacyModalVisible(false);
+    return;
+  }
+  if(licenseModal && !licenseModal.hidden){
     setLicenseModalVisible(false);
   }
 });

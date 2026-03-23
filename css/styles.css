@@ -238,7 +238,7 @@
 
   /* Instructions block */
   .instructions{
-    margin-top:12px; padding:10px; border:1px dashed #20303d; border-radius:8px; background:#0d141a;
+    margin-top:12px; padding:10px; border:1px solid #20303d; border-radius:8px; background:#0d141a;
     color:#bdc9d6; font-size:12.5px;
   }
   .instructions-head{
@@ -266,23 +266,44 @@
   }
   .instructions .line + .line{ margin-top:0.5em; } /* 0.5 line space between lines */
   .instructions-meta{
-    display:block;
+    display:grid;
+    grid-template-columns:auto auto auto;
+    justify-content:center;
+    align-items:center;
+    column-gap:4px;
+    flex-wrap:nowrap;
     width:100%;
     margin-top:10px;
+    color:#6f7e8d;
+    font-size:10px;
+    font-style:italic;
+  }
+  .instructions-meta-link{
+    display:inline-flex;
+    align-items:center;
     padding:0;
     border:none;
     background:none;
-    text-align:right;
     color:#6f7e8d;
-    font-size:10.5px;
-    font-style:italic;
+    font:inherit;
+    text-decoration-line:underline;
+    text-decoration-style:dotted;
+    text-decoration-thickness:1px;
+    text-underline-offset:2px;
     cursor:pointer;
+    flex:0 0 auto;
   }
-  .instructions-meta:hover{
+  .instructions-meta-link + .instructions-meta-link::before{
+    content:"|";
+    color:#5f6e7d;
+    margin-right:4px;
+    text-decoration:none;
+  }
+  .instructions-meta-link:hover{
     color:#8ba0b6;
-    text-decoration:underline;
+    text-decoration-thickness:1px;
   }
-  .instructions-meta:focus-visible{
+  .instructions-meta-link:focus-visible{
     outline:2px solid var(--control-ring);
     outline-offset:2px;
     border-radius:4px;

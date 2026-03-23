@@ -12,7 +12,7 @@
 
   gtag('config', 'G-ZWPMWZW5VN');
 </script>
-<link rel="stylesheet" href="css/styles.css?v=1.1.2" />
+<link rel="stylesheet" href="css/styles.css?v=1.1.3" />
 </head>
 <body>
 <div class="layout">
@@ -55,7 +55,11 @@
         <input type="range" id="leftWidth" min="0" max="1" step="0.001" value="0.5" />
       </div>
       <div class="row row-offset">
-        <label for="leftPosition">Position</label>
+        <label for="leftLateral">Left/Right</label>
+        <input type="range" id="leftLateral" min="0" max="1" step="0.001" value="0.5" />
+      </div>
+      <div class="row">
+        <label for="leftPosition">Forward/Back</label>
         <input type="range" id="leftPosition" min="0" max="1" step="0.001" value="0.5" />
       </div>
 
@@ -75,11 +79,11 @@
           <div class="title">Notes</div>
           <button id="btnCloseInstructions" class="instructions-close" type="button" aria-label="Close instructions">X</button>
         </div>
-        <div class="line">Select the game format and starting formations.</div>
-        <div class="line">Expand width and depth of outfield players.</div>
-        <div class="line">Adjust position of outfield players on pitch.</div>
-        <div class="line">Drag ball onto player to retain position. Double click to release possession.</div>
-        <div class="line">Double click player to turn off visibility.</div>
+        <div class="line">Select game format and formations.</div>
+        <div class="line">Adjust width, depth, and position of players.</div>
+        <div class="line">Drag the ball onto a player to retain possession. Double click to release possession.</div>
+        <div class="line">Double click a player to hide them.</div>
+        <div class="line">Click and drag to move individual players.</div>
         <div class="line">Use Reset Positions or Reset to Kickoff as needed.</div>
         <div class="instructions-meta" aria-label="Footer links">
           <button
@@ -106,7 +110,7 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            v1.1.2
+            v1.1.3
           </a>
         </div>
       </div>
@@ -195,7 +199,11 @@
         <input type="range" id="rightWidth" min="0" max="1" step="0.001" value="0.5" />
       </div>
       <div class="row row-offset">
-        <label for="rightPosition">Position</label>
+        <label for="rightLateral">Left/Right</label>
+        <input type="range" id="rightLateral" min="0" max="1" step="0.001" value="0.5" />
+      </div>
+      <div class="row">
+        <label for="rightPosition">Forward/Back</label>
         <input type="range" id="rightPosition" min="0" max="1" step="0.001" value="0.5" />
       </div>
 
@@ -235,7 +243,7 @@
     </div>
     <div class="modal-body">
       <p><strong>Soccerboard</strong> is Copyright Ben Kickert.</p>
-      <p>Version: <strong>v1.1.2</strong></p>
+      <p>Version: <strong>v1.1.3</strong></p>
       <p>Licensed under <strong>PolyForm Noncommercial 1.0.0</strong>.</p>
       <p>Use and modification are allowed for noncommercial purposes. Attribution notices must be preserved. Commercial use or resale is not permitted under this license.</p>
       <p><a href="LICENSE" target="_blank" rel="noopener noreferrer">View local license file</a></p>
@@ -246,7 +254,7 @@
   </div>
 </div>
 
-<script src="js/app.js?v=1.1.2"></script>
+<script src="js/app.js?v=1.1.3"></script>
 </body>
 </html>
 

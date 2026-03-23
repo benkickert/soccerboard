@@ -287,6 +287,7 @@ class Team {
 
     this.depthVal = 0.5;              // [0,1]
     this.widthVal = 0.5;              // [0,1]
+    this.lateralVal = 0.5;            // [0,1]
     this.positionVal = 0.5;           // [0,1] (Away mirrored in mapping)
     this.anchorU = 25;                // last defender anchor from own goal line
     this.gkX = (this.attack===+1) ? GK_X_LEFT : GK_X_RIGHT;
@@ -336,6 +337,11 @@ class Team {
   widthScale(w){
     if(w <= 0.5) return w/0.5;              // [0..1]
     return 1 + ((w-0.5)/0.5) * 0.3;         // (1..1.3]
+  }
+  deltaYForLateral(p, ys){
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    return lerp(-minY, PITCH_WID - maxY, p);
   }
 
   computeFontSize(label){
@@ -403,6 +409,7 @@ class Team {
     const s = this.widthScale(this.widthVal);
 
     const pts = [];
+    const outfieldYs = [];
     for(const pl of this.players){
       let x, y;
       // Away team is mirrored so left/right roles stay correct from their perspective.
@@ -415,8 +422,15 @@ class Team {
         x = this.uToX(clamp(u, 0, PITCH_LEN));   // base layout stays within the lines
         const yNorm = 0.5 + (baseYNorm - 0.5) * s;
         y = clampY(yNorm * PITCH_WID);
+        outfieldYs.push(y);
       }
       pts.push({pl, x, y});
+    }
+    const lateralDelta = outfieldYs.length ? this.deltaYForLateral(this.lateralVal, outfieldYs) : 0;
+    for(const item of pts){
+      if(item.pl.t !== null){
+        item.y = clampY(item.y + lateralDelta);
+      }
     }
     return pts;
   }
@@ -583,6 +597,7 @@ class Team {
     for(const pl of this.players){ pl.dragDX=0; pl.dragDY=0; pl.dragged=false; }
     this.depthVal = 0.5;
     this.widthVal = 0.5;
+    this.lateralVal = 0.5;
     this.positionVal = 0.5;
     this.anchorU = 25;
     this.updatePositions();
@@ -772,6 +787,8 @@ const leftExpand        = document.getElementById('leftExpand');
 const rightExpand       = document.getElementById('rightExpand');
 const leftWidth         = document.getElementById('leftWidth');
 const rightWidth        = document.getElementById('rightWidth');
+const leftLateral       = document.getElementById('leftLateral');
+const rightLateral      = document.getElementById('rightLateral');
 const leftPosition      = document.getElementById('leftPosition');
 const rightPosition     = document.getElementById('rightPosition');
 const btnResetDragged   = document.getElementById('btnResetDragged');
@@ -901,6 +918,9 @@ function initControls(){
   leftWidth.addEventListener('input', e=>{ teams.left.widthVal = parseFloat(e.target.value); teams.left.updatePositions(); });
   rightWidth.addEventListener('input', e=>{ teams.right.widthVal = parseFloat(e.target.value); teams.right.updatePositions(); });
 
+  leftLateral.addEventListener('input', e=>{ teams.left.lateralVal = parseFloat(e.target.value); teams.left.updatePositions(); });
+  rightLateral.addEventListener('input', e=>{ teams.right.lateralVal = parseFloat(e.target.value); teams.right.updatePositions(); });
+
   leftPosition.addEventListener('input', e=>{ teams.left.positionVal = parseFloat(e.target.value); teams.left.updatePositions(); });
   rightPosition.addEventListener('input', e=>{ teams.right.positionVal = parseFloat(e.target.value); teams.right.updatePositions(); });
 
@@ -941,6 +961,7 @@ function resetAllToKickoff(){
 
   leftExpand.value = rightExpand.value = 0.5;
   leftWidth.value  = rightWidth.value  = 0.5;
+  leftLateral.value = rightLateral.value = 0.5;
   leftPosition.value = rightPosition.value = 0.5;
 
   // Ball back to center; halo visible again

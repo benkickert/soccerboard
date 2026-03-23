@@ -1,6 +1,6 @@
 # Soccerboard
 
-Soccerboard is an interactive 11v11 soccer tactics board.
+Soccerboard is an interactive soccer tactics board.
 
 ## License
 

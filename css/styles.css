@@ -40,6 +40,14 @@
     align-items:center;
     gap:10px;
   }
+  .topbar-tools{
+    grid-area:focus;
+    justify-self:center;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+  }
   .topbar-title{
     grid-area:title;
     justify-self:start;
@@ -49,8 +57,6 @@
     text-overflow:ellipsis;
   }
   .focus-toggle{
-    grid-area:focus;
-    justify-self:center;
     position:relative;
     display:flex;
     align-items:center;
@@ -74,6 +80,21 @@
   .focus-text{
     font-size:13px;
     letter-spacing:.15px;
+  }
+  .header-select{
+    display:flex;
+    align-items:center;
+  }
+  .header-select select{
+    width:auto;
+    min-width:78px;
+    height:28px;
+    padding:4px 28px 4px 10px;
+    border-radius:999px;
+    background:linear-gradient(180deg, #1a2836, #142231);
+    border-color:#304154;
+    font-size:12px;
+    font-weight:700;
   }
   .focus-switch{
     width:34px;
@@ -124,7 +145,7 @@
   .panel{ padding:14px 14px 12px; border-bottom:1px dashed #1c2530; }
   .panel h2{ margin:0 0 10px; font-size:13px; font-weight:700; color:var(--muted); letter-spacing:.4px; text-transform:uppercase; }
   /* Controls layout: keep the control column stable so selects and sliders align */
-  .row{ display:grid; grid-template-columns: minmax(0, 1fr) 220px; align-items:center; gap:10px; margin:8px 0; }
+  .row{ display:grid; grid-template-columns: 88px minmax(0, 1fr); align-items:center; gap:10px; margin:8px 0; }
   .row label{ color:var(--ink); font-weight:600; font-size:13px }
 
   select, input[type="range"], button{
@@ -387,7 +408,7 @@
     height:100%;
   }
 
-  @media (max-width: 1100px){ .layout{grid-template-columns: 260px 1fr 260px;} .row{grid-template-columns:minmax(0,1fr) 200px;} }
+  @media (max-width: 1100px){ .layout{grid-template-columns: 260px 1fr 260px;} .row{grid-template-columns:76px minmax(0,1fr);} }
   @media (max-width: 900px){
     .layout{grid-template-columns: 1fr}
     .controls.right{order:3} .controls{order:1} .canvas-wrap{order:2; min-height:60vh}
@@ -417,13 +438,25 @@
         "title title"
         "focus actions";
     }
-    .focus-toggle{
+    .topbar-tools{
       justify-self:start;
+      gap:8px;
+    }
+    .focus-toggle{
       padding:5px 8px 5px 6px;
       gap:7px;
     }
     .focus-text{
       font-size:12px;
+    }
+    .header-select{
+      padding:0;
+    }
+    .header-select select{
+      min-width:72px;
+      height:26px;
+      font-size:11px;
+      padding:3px 24px 3px 9px;
     }
     .focus-switch{
       width:30px;
@@ -448,11 +481,23 @@
         "title title"
         "focus actions";
     }
+    .topbar-tools{
+      gap:6px;
+    }
     .focus-toggle{
       padding:4px 7px 4px 6px;
       gap:6px;
     }
     .focus-text{
+      font-size:11px;
+    }
+    .header-select{
+      padding:0;
+    }
+    .header-select select{
+      min-width:64px;
+      height:24px;
+      padding:2px 22px 2px 8px;
       font-size:11px;
     }
     .header-actions{
@@ -470,6 +515,9 @@
     }
     .focus-toggle{
       padding:4px 6px;
+    }
+    .header-select{
+      padding:0;
     }
     .header-actions button{
       padding:6px 7px;

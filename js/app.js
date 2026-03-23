@@ -765,12 +765,9 @@ const teams = {
 buildBall();
 
 /* ---------- Controls ---------- */
-const leftGameFormatSel = document.getElementById('leftGameFormat');
-const rightGameFormatSel = document.getElementById('rightGameFormat');
+const gameFormatSelect  = document.getElementById('gameFormatSelect');
 const leftFormationSel  = document.getElementById('leftFormation');
 const rightFormationSel = document.getElementById('rightFormation');
-const leftColorSel      = document.getElementById('leftColor');
-const rightColorSel     = document.getElementById('rightColor');
 const leftExpand        = document.getElementById('leftExpand');
 const rightExpand       = document.getElementById('rightExpand');
 const leftWidth         = document.getElementById('leftWidth');
@@ -880,8 +877,7 @@ function populateFormationOptions(){
 function setGameFormat(formatKey){
   if(!FORMATION_SETS[formatKey]) return;
   currentGameFormat = formatKey;
-  if(leftGameFormatSel) leftGameFormatSel.value = formatKey;
-  if(rightGameFormatSel) rightGameFormatSel.value = formatKey;
+  if(gameFormatSelect) gameFormatSelect.value = formatKey;
 
   teams.left.setFormation(defaultFormationFor(formatKey, 'left'));
   teams.right.setFormation(defaultFormationFor(formatKey, 'right'));
@@ -891,16 +887,8 @@ function setGameFormat(formatKey){
 
 function initControls(){
   // Shared game format
-  if(leftGameFormatSel) leftGameFormatSel.value = currentGameFormat;
-  if(rightGameFormatSel) rightGameFormatSel.value = currentGameFormat;
-  leftGameFormatSel?.addEventListener('change', e=> setGameFormat(e.target.value));
-  rightGameFormatSel?.addEventListener('change', e=> setGameFormat(e.target.value));
-
-  // Colors
-  leftColorSel.value = teams.left.colorKey;
-  rightColorSel.value = teams.right.colorKey;
-  leftColorSel.addEventListener('change', e=>{ teams.left.setColor(e.target.value); });
-  rightColorSel.addEventListener('change', e=>{ teams.right.setColor(e.target.value); });
+  if(gameFormatSelect) gameFormatSelect.value = currentGameFormat;
+  gameFormatSelect?.addEventListener('change', e=> setGameFormat(e.target.value));
 
   // Formations
   leftFormationSel.addEventListener('change', e=>{ teams.left.setFormation(e.target.value); });

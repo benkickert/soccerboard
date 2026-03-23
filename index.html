@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>11v11 Soccer Tactics Board</title>
-<link rel="stylesheet" href="css/styles.css?v=1.0.2" />
+<link rel="stylesheet" href="css/styles.css?v=1.0.3" />
 </head>
 <body>
 <div class="layout">
@@ -81,7 +81,7 @@
           aria-haspopup="dialog"
           aria-controls="licenseModal"
         >
-          Copyright Ben Kickert | v1.0.2
+          Copyright Ben Kickert | v1.0.3
         </button>
       </div>
     </div>
@@ -89,8 +89,8 @@
 
   <!-- Canvas -->
   <main class="canvas-wrap">
-    <!-- SVG in meters: field-only viewBox; canvas background fills letterbox space -->
-    <svg id="pitch" class="pitch-svg" viewBox="0 0 105 68" preserveAspectRatio="xMidYMid meet">
+    <!-- SVG in yards with a 1yd margin so exterior corner arcs remain visible -->
+    <svg id="pitch" class="pitch-svg" viewBox="-1 -1 117 77" preserveAspectRatio="xMidYMid meet">
       <defs>
         <pattern id="grass" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="scale(2)">
           <rect width="10" height="10" fill="#2e7d32"></rect>
@@ -102,30 +102,46 @@
       </defs>
 
       <g id="scene">
-        <!-- Pitch base (0..105 x, 0..68 y) -->
+        <!-- Pitch base (0..115 x, 0..75 y) -->
         <g id="field">
-          <rect x="0" y="0" width="105" height="68" fill="url(#grass)" stroke="#f4f9ff" stroke-width="0.12"></rect>
-          <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="#f4f9ff" stroke-width="0.12"></line>
-          <circle cx="52.5" cy="34" r="9.15" fill="none" stroke="#f4f9ff" stroke-width="0.12"></circle>
-          <circle cx="52.5" cy="34" r="0.2" fill="#f4f9ff"></circle>
+          <rect x="0" y="0" width="115" height="75" fill="url(#grass)" stroke="#f4f9ff" stroke-width="0.12"></rect>
+          <line x1="57.5" y1="0" x2="57.5" y2="75" stroke="#f4f9ff" stroke-width="0.12"></line>
+          <circle cx="57.5" cy="37.5" r="10" fill="none" stroke="#f4f9ff" stroke-width="0.12"></circle>
+          <circle cx="57.5" cy="37.5" r="0.2" fill="#f4f9ff"></circle>
+
+          <!-- Goals (24ft / 8yd wide) -->
+          <rect x="-0.5" y="33.5" width="0.5" height="8" fill="#f4f9ff"></rect>
+          <rect x="115" y="33.5" width="0.5" height="8" fill="#f4f9ff"></rect>
+          <path d="M 0 33.5 H -0.5 V 41.5 H 0" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+          <path d="M 115 33.5 H 115.5 V 41.5 H 115" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
 
           <!-- Left penalty -->
-          <rect x="0" y="13.84" width="16.5" height="40.32" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
-          <rect x="0" y="24.84" width="5.5" height="18.32" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
-          <circle cx="11" cy="34" r="0.2" fill="#f4f9ff"></circle>
-          <path d="M 16.5 34 m 0 -9.15 a 9.15 9.15 0 0 1 0 18.3" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+          <rect x="0" y="15.5" width="18" height="44" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
+          <rect x="0" y="27.5" width="6" height="20" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
+          <circle cx="12" cy="37.5" r="0.2" fill="#f4f9ff"></circle>
+          <path d="M 18 29.5 A 10 10 0 0 1 18 45.5" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
 
           <!-- Right penalty -->
-          <rect x="88.5" y="13.84" width="16.5" height="40.32" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
-          <rect x="99.5" y="24.84" width="5.5" height="18.32" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
-          <circle cx="94" cy="34" r="0.2" fill="#f4f9ff"></circle>
-          <path d="M 88.5 34 m 0 -9.15 a 9.15 9.15 0 0 0 0 18.3" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+          <rect x="97" y="15.5" width="18" height="44" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
+          <rect x="109" y="27.5" width="6" height="20" fill="none" stroke="#f4f9ff" stroke-width="0.12"></rect>
+          <circle cx="103" cy="37.5" r="0.2" fill="#f4f9ff"></circle>
+          <path d="M 97 29.5 A 10 10 0 0 0 97 45.5" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
 
-          <!-- Corners (1m) -->
-          <path d="M 0 1 a 1 1 0 0 1 1 -1" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
-          <path d="M 0 67 a 1 1 0 0 0 1 1" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
-          <path d="M 105 1 a 1 1 0 0 0 -1 -1" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
-          <path d="M 105 67 a 1 1 0 0 1 -1 1" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+          <!-- Corners (1yd, inside field) -->
+          <path d="M 1 0 A 1 1 0 0 1 0 1" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+          <path d="M 0 74 A 1 1 0 0 1 1 75" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+          <path d="M 114 0 A 1 1 0 0 0 115 1" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+          <path d="M 115 74 A 1 1 0 0 0 114 75" fill="none" stroke="#f4f9ff" stroke-width="0.12"></path>
+
+          <!-- 10yd corner-kick hash marks -->
+          <line x1="10" y1="0" x2="10" y2="-0.5" stroke="#f4f9ff" stroke-width="0.12"></line>
+          <line x1="105" y1="0" x2="105" y2="-0.5" stroke="#f4f9ff" stroke-width="0.12"></line>
+          <line x1="10" y1="75" x2="10" y2="75.5" stroke="#f4f9ff" stroke-width="0.12"></line>
+          <line x1="105" y1="75" x2="105" y2="75.5" stroke="#f4f9ff" stroke-width="0.12"></line>
+          <line x1="0" y1="10" x2="-0.5" y2="10" stroke="#f4f9ff" stroke-width="0.12"></line>
+          <line x1="0" y1="65" x2="-0.5" y2="65" stroke="#f4f9ff" stroke-width="0.12"></line>
+          <line x1="115" y1="10" x2="115.5" y2="10" stroke="#f4f9ff" stroke-width="0.12"></line>
+          <line x1="115" y1="65" x2="115.5" y2="65" stroke="#f4f9ff" stroke-width="0.12"></line>
         </g>
 
         <!-- Z-order: Away (right) bottom, Home (left) above, Ball on top -->
@@ -188,7 +204,7 @@
     </div>
     <div class="modal-body">
       <p><strong>Soccerboard</strong> is Copyright Ben Kickert.</p>
-      <p>Version: <strong>v1.0.2</strong></p>
+      <p>Version: <strong>v1.0.3</strong></p>
       <p>Licensed under <strong>PolyForm Noncommercial 1.0.0</strong>.</p>
       <p>Use and modification are allowed for noncommercial purposes. Attribution notices must be preserved. Commercial use or resale is not permitted under this license.</p>
       <p><a href="LICENSE" target="_blank" rel="noopener noreferrer">View local license file</a></p>
@@ -199,7 +215,7 @@
   </div>
 </div>
 
-<script src="js/app.js?v=1.0.2"></script>
+<script src="js/app.js?v=1.0.3"></script>
 </body>
 </html>
 

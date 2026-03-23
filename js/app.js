@@ -5,12 +5,12 @@
    - Added a controls toggle and responsive pitch orientation.
    ============================================================ */
 
-const PITCH_LEN = 105;
-const PITCH_WID = 68;
-const GOAL_MARGIN = 1;   // +/-1m horizontally
-const TOUCH_MARGIN = 3;  // +/-3m vertically
-const MID_X = PITCH_LEN/2;           // 52.5
-const CIRCLE_R = 9.15;               // 10 yards
+const PITCH_LEN = 115;
+const PITCH_WID = 75;
+const GOAL_MARGIN = 1;   // +/-1yd horizontally
+const TOUCH_MARGIN = 3;  // +/-3yd vertically
+const MID_X = PITCH_LEN/2;           // 57.5
+const CIRCLE_R = 10;                 // 10 yards
 const GK_X_LEFT  = 6;
 const GK_X_RIGHT = PITCH_LEN - GK_X_LEFT;
 let isPitchPortrait = false;
@@ -634,8 +634,8 @@ function updatePitchOrientation(){
   if(rect.width <= 0 || rect.height <= 0) return;
 
   const areaRatio = rect.width / rect.height;
-  const landscapeRatio = PITCH_LEN / PITCH_WID; // 105/68
-  const portraitRatio = PITCH_WID / PITCH_LEN;  // 68/105
+  const landscapeRatio = PITCH_LEN / PITCH_WID; // 115/75
+  const portraitRatio = PITCH_WID / PITCH_LEN;  // 75/115
 
   // Compare relative distance to both target ratios.
   const distLandscape = Math.abs(Math.log(areaRatio / landscapeRatio));
@@ -646,10 +646,10 @@ function updatePitchOrientation(){
   isPitchPortrait = portrait;
   svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
   if(portrait){
-    svg.setAttribute('viewBox', '0 0 68 105');
-    scene.setAttribute('transform', 'matrix(0 1 -1 0 68 0)');
+    svg.setAttribute('viewBox', '-1 -1 77 117');
+    scene.setAttribute('transform', 'matrix(0 1 -1 0 75 0)');
   }else{
-    svg.setAttribute('viewBox', '0 0 105 68');
+    svg.setAttribute('viewBox', '-1 -1 117 77');
     scene.removeAttribute('transform');
   }
   if(changed && typeof teams !== 'undefined'){

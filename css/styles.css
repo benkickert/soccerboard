@@ -123,8 +123,8 @@
   .controls.right{ border-right:none; border-left:1px solid #182028; }
   .panel{ padding:14px 14px 12px; border-bottom:1px dashed #1c2530; }
   .panel h2{ margin:0 0 10px; font-size:13px; font-weight:700; color:var(--muted); letter-spacing:.4px; text-transform:uppercase; }
-  /* Controls layout: widen the input column so selects = sliders */
-  .row{ display:grid; grid-template-columns: 1fr 220px; align-items:center; gap:10px; margin:8px 0; }
+  /* Controls layout: keep the control column stable so selects and sliders align */
+  .row{ display:grid; grid-template-columns: minmax(0, 1fr) 220px; align-items:center; gap:10px; margin:8px 0; }
   .row label{ color:var(--ink); font-weight:600; font-size:13px }
 
   select, input[type="range"], button{
@@ -139,6 +139,11 @@
     box-sizing:border-box;
     transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
   }
+  select,
+  input[type="range"]{
+    min-width:0;
+    height:34px;
+  }
   select:hover, input[type="range"]:hover, button:hover{
     border-color:var(--control-border-hover);
   }
@@ -148,7 +153,7 @@
   }
   /* Range track/handle & ensure the right edge is visible */
   input[type="range"]{
-    appearance:none; height:34px; padding:0; margin:0;
+    appearance:none; padding:0; margin:0;
   }
   input[type="range"]::-webkit-slider-runnable-track{height:4px; background:#1a222b; border-radius:3px}
   input[type="range"]::-webkit-slider-thumb{
@@ -361,7 +366,7 @@
     height:100%;
   }
 
-  @media (max-width: 1100px){ .layout{grid-template-columns: 260px 1fr 260px;} .row{grid-template-columns:1fr 200px;} }
+  @media (max-width: 1100px){ .layout{grid-template-columns: 260px 1fr 260px;} .row{grid-template-columns:minmax(0,1fr) 200px;} }
   @media (max-width: 900px){
     .layout{grid-template-columns: 1fr}
     .controls.right{order:3} .controls{order:1} .canvas-wrap{order:2; min-height:60vh}

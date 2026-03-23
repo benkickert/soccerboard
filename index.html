@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>11v11 Soccer Tactics Board</title>
-<link rel="stylesheet" href="css/styles.css?v=1.0.3" />
+<title>Soccer Tactics Board</title>
+<link rel="stylesheet" href="css/styles.css?v=1.1.0" />
 </head>
 <body>
 <div class="layout">
   <header class="topbar">
-    <h1 class="topbar-title">11v11 Soccer Tactics Board</h1>
+    <h1 class="topbar-title">Soccer Tactics Board</h1>
     <label class="focus-toggle" for="focusModeToggle">
       <input type="checkbox" id="focusModeToggle" />
       <span class="focus-switch" aria-hidden="true"></span>
@@ -25,6 +25,14 @@
   <aside class="controls" id="leftControls">
     <div class="panel">
       <h2>Home Team</h2>
+      <div class="row">
+        <label for="leftGameFormat">Format</label>
+        <select id="leftGameFormat">
+          <option value="11v11" selected>11v11</option>
+          <option value="9v9">9v9</option>
+          <option value="7v7">7v7</option>
+        </select>
+      </div>
       <div class="row">
         <label for="leftColor">Color</label>
         <select id="leftColor">
@@ -68,7 +76,7 @@
           <div class="title">Instructions</div>
           <button id="btnCloseInstructions" class="instructions-close" type="button" aria-label="Close instructions">X</button>
         </div>
-        <div class="line">Select starting color and starting formation.</div>
+        <div class="line">Select format, colors, and starting formations.</div>
         <div class="line">Expand width and depth of outfield players.</div>
         <div class="line">Adjust position of outfield players on pitch.</div>
         <div class="line">Drag ball onto player to retain position. Double click to release possession.</div>
@@ -81,7 +89,7 @@
           aria-haspopup="dialog"
           aria-controls="licenseModal"
         >
-          Copyright Ben Kickert | v1.0.3
+          Copyright Ben Kickert | v1.1.0
         </button>
       </div>
     </div>
@@ -157,6 +165,14 @@
     <div class="panel">
       <h2>Away Team</h2>
       <div class="row">
+        <label for="rightGameFormat">Format</label>
+        <select id="rightGameFormat">
+          <option value="11v11" selected>11v11</option>
+          <option value="9v9">9v9</option>
+          <option value="7v7">7v7</option>
+        </select>
+      </div>
+      <div class="row">
         <label for="rightColor">Color</label>
         <select id="rightColor">
           <option value="red">Red</option>
@@ -204,7 +220,7 @@
     </div>
     <div class="modal-body">
       <p><strong>Soccerboard</strong> is Copyright Ben Kickert.</p>
-      <p>Version: <strong>v1.0.3</strong></p>
+      <p>Version: <strong>v1.1.0</strong></p>
       <p>Licensed under <strong>PolyForm Noncommercial 1.0.0</strong>.</p>
       <p>Use and modification are allowed for noncommercial purposes. Attribution notices must be preserved. Commercial use or resale is not permitted under this license.</p>
       <p><a href="LICENSE" target="_blank" rel="noopener noreferrer">View local license file</a></p>
@@ -215,7 +231,7 @@
   </div>
 </div>
 
-<script src="js/app.js?v=1.0.3"></script>
+<script src="js/app.js?v=1.1.0"></script>
 </body>
 </html>
 

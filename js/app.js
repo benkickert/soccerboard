@@ -1,5 +1,5 @@
 ﻿/* ============================================================
-   11v11 Soccer Tactics Board
+   Soccer Tactics Board
    - Split HTML, CSS, and JS for easier maintenance.
    - Updated starting layouts and mobile control behavior.
    - Added a controls toggle and responsive pitch orientation.
@@ -45,125 +45,219 @@ const Y = {
 };
 
 /* ---------- Formation templates ---------- */
-const FORMATIONS = {
-  '4-4-2 (Flat)': [
-    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
-    {label:'LB',  sideId:'LB',  t:0.00, y:Y.EQ1},
-    {label:'LCB', sideId:'LCB', t:0.00, y:Y.EQ2},
-    {label:'RCB', sideId:'RCB', t:0.00, y:Y.EQ3},
-    {label:'RB',  sideId:'RB',  t:0.00, y:Y.EQ4},
-    {label:'LW',  sideId:'LW',  t:0.52, y:0.24},
-    {label:'LCM', sideId:'LCM', t:0.52, y:0.42},
-    {label:'RCM', sideId:'RCM', t:0.52, y:0.58},
-    {label:'RW',  sideId:'RW',  t:0.52, y:0.76},
-    {label:'LS',  sideId:'LS',  t:1.00, y:0.40},
-    {label:'RS',  sideId:'RS',  t:1.00, y:0.60},
-  ],
-  '4-4-2 (Diamond)': [
-    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
-    {label:'LB',  sideId:'LB',  t:0.00, y:Y.EQ1},
-    {label:'LCB', sideId:'LCB', t:0.00, y:Y.EQ2},
-    {label:'RCB', sideId:'RCB', t:0.00, y:Y.EQ3},
-    {label:'RB',  sideId:'RB',  t:0.00, y:Y.EQ4},
-    {label:'CDM', sideId:'CDM', t:0.36, y:Y.CENTRE},
-    {label:'LCM', sideId:'LCM', t:0.55, y:0.36},
-    {label:'RCM', sideId:'RCM', t:0.55, y:0.64},
-    {label:'CAM', sideId:'CAM', t:0.70, y:Y.CENTRE},
-    {label:'LS',  sideId:'LS',  t:1.00, y:0.40},
-    {label:'RS',  sideId:'RS',  t:1.00, y:0.60},
-  ],
-  '4-3-3': [
-    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
-    {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
-    {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
-    {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
-    {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
-    {label:'LM',  sideId:'LM',  t:0.56, y:0.34},
-    {label:'CM',  sideId:'CM',  t:0.46, y:Y.CENTRE},
-    {label:'RM',  sideId:'RM',  t:0.56, y:0.66},
-    {label:'LW',  sideId:'LW',  t:1.00, y:0.22},
-    {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
-    {label:'RW',  sideId:'RW',  t:1.00, y:0.78},
-  ],
-  '4-2-3-1': [
-    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
-    {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
-    {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
-    {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
-    {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
-    {label:'CDM', sideId:'LCDM',t:0.42, y:0.44},
-    {label:'CDM', sideId:'RCDM',t:0.42, y:0.56},
-    {label:'LW',  sideId:'LW',  t:0.71, y:0.24},
-    {label:'CAM', sideId:'CAM', t:0.71, y:Y.CENTRE},
-    {label:'RW',  sideId:'RW',  t:0.71, y:0.76},
-    {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
-  ],
-  '3-5-2': [
-    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
-    {label:'LCB', sideId:'LCB', t:0.00, y:0.34},
-    {label:'CB',  sideId:'CB',  t:0.00, y:Y.CENTRE},
-    {label:'RCB', sideId:'RCB', t:0.00, y:0.66},
-    {label:'LWB', sideId:'LWB', t:0.56, y:Y.WIDE_TOP},
-    {label:'RWB', sideId:'RWB', t:0.56, y:Y.WIDE_BOT},
-    {label:'LCM', sideId:'LCM', t:0.60, y:0.40},
-    {label:'CM',  sideId:'CM',  t:0.52, y:Y.CENTRE},
-    {label:'RCM', sideId:'RCM', t:0.60, y:0.60},
-    {label:'LS',  sideId:'LS',  t:1.00, y:0.40},
-    {label:'RS',  sideId:'RS',  t:1.00, y:0.60},
-  ],
-  '3-4-3 (Flat)': [
-    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
-    {label:'LCB', sideId:'LCB', t:0.00, y:0.34},
-    {label:'CB',  sideId:'CB',  t:0.00, y:Y.CENTRE},
-    {label:'RCB', sideId:'RCB', t:0.00, y:0.66},
-    {label:'LWB', sideId:'LWB', t:0.58, y:Y.WIDE_TOP},
-    {label:'LCM', sideId:'LCM', t:0.54, y:0.42},
-    {label:'RCM', sideId:'RCM', t:0.54, y:0.58},
-    {label:'RWB', sideId:'RWB', t:0.58, y:Y.WIDE_BOT},
-    {label:'LW',  sideId:'LW',  t:1.00, y:0.24},
-    {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
-    {label:'RW',  sideId:'RW',  t:1.00, y:0.76},
-  ],
-  '3-4-3 (Diamond)': [
-    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
-    {label:'LCB', sideId:'LCB', t:0.00, y:0.34},
-    {label:'CB',  sideId:'CB',  t:0.00, y:Y.CENTRE},
-    {label:'RCB', sideId:'RCB', t:0.00, y:0.66},
-    {label:'CDM', sideId:'CDM', t:0.40, y:Y.CENTRE},
-    {label:'LCM', sideId:'LCM', t:0.57, y:0.36},
-    {label:'RCM', sideId:'RCM', t:0.57, y:0.64},
-    {label:'CAM', sideId:'CAM', t:0.74, y:Y.CENTRE},
-    {label:'LW',  sideId:'LW',  t:1.00, y:0.22},
-    {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
-    {label:'RW',  sideId:'RW',  t:1.00, y:0.78},
-  ],
-  '4-1-3-2': [
-    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
-    {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
-    {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
-    {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
-    {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
-    {label:'CDM', sideId:'CDM', t:0.30, y:Y.CENTRE},
-    {label:'LM',  sideId:'LM',  t:0.60, y:0.32},
-    {label:'CAM', sideId:'CAM', t:0.60, y:Y.CENTRE},
-    {label:'RM',  sideId:'RM',  t:0.60, y:0.68},
-    {label:'LS',  sideId:'LS',  t:1.00, y:0.42},
-    {label:'RS',  sideId:'RS',  t:1.00, y:0.58},
-  ],
-  '4-3-2-1': [
-    {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
-    {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
-    {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
-    {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
-    {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
-    {label:'LCM', sideId:'LCM', t:0.50, y:0.34},
-    {label:'CDM', sideId:'CDM', t:0.38, y:Y.CENTRE},
-    {label:'RCM', sideId:'RCM', t:0.50, y:0.66},
-    {label:'LAM', sideId:'LAM', t:0.72, y:0.45},
-    {label:'RAM', sideId:'RAM', t:0.72, y:0.55},
-    {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
-  ],
+const FORMATION_SETS = {
+  '11v11': {
+    '4-4-2 (Flat)': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB',  sideId:'LB',  t:0.00, y:Y.EQ1},
+      {label:'LCB', sideId:'LCB', t:0.00, y:Y.EQ2},
+      {label:'RCB', sideId:'RCB', t:0.00, y:Y.EQ3},
+      {label:'RB',  sideId:'RB',  t:0.00, y:Y.EQ4},
+      {label:'LW',  sideId:'LW',  t:0.52, y:0.24},
+      {label:'LCM', sideId:'LCM', t:0.52, y:0.42},
+      {label:'RCM', sideId:'RCM', t:0.52, y:0.58},
+      {label:'RW',  sideId:'RW',  t:0.52, y:0.76},
+      {label:'LS',  sideId:'LS',  t:1.00, y:0.40},
+      {label:'RS',  sideId:'RS',  t:1.00, y:0.60},
+    ],
+    '4-4-2 (Diamond)': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB',  sideId:'LB',  t:0.00, y:Y.EQ1},
+      {label:'LCB', sideId:'LCB', t:0.00, y:Y.EQ2},
+      {label:'RCB', sideId:'RCB', t:0.00, y:Y.EQ3},
+      {label:'RB',  sideId:'RB',  t:0.00, y:Y.EQ4},
+      {label:'CDM', sideId:'CDM', t:0.36, y:Y.CENTRE},
+      {label:'LCM', sideId:'LCM', t:0.55, y:0.36},
+      {label:'RCM', sideId:'RCM', t:0.55, y:0.64},
+      {label:'CAM', sideId:'CAM', t:0.70, y:Y.CENTRE},
+      {label:'LS',  sideId:'LS',  t:1.00, y:0.40},
+      {label:'RS',  sideId:'RS',  t:1.00, y:0.60},
+    ],
+    '4-3-3': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
+      {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
+      {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
+      {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
+      {label:'LM',  sideId:'LM',  t:0.56, y:0.34},
+      {label:'CM',  sideId:'CM',  t:0.46, y:Y.CENTRE},
+      {label:'RM',  sideId:'RM',  t:0.56, y:0.66},
+      {label:'LW',  sideId:'LW',  t:1.00, y:0.22},
+      {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
+      {label:'RW',  sideId:'RW',  t:1.00, y:0.78},
+    ],
+    '4-2-3-1': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
+      {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
+      {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
+      {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
+      {label:'CDM', sideId:'LCDM', t:0.42, y:0.44},
+      {label:'CDM', sideId:'RCDM', t:0.42, y:0.56},
+      {label:'LW',  sideId:'LW',  t:0.71, y:0.24},
+      {label:'CAM', sideId:'CAM', t:0.71, y:Y.CENTRE},
+      {label:'RW',  sideId:'RW',  t:0.71, y:0.76},
+      {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
+    ],
+    '3-5-2': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LCB', sideId:'LCB', t:0.00, y:0.34},
+      {label:'CB',  sideId:'CB',  t:0.00, y:Y.CENTRE},
+      {label:'RCB', sideId:'RCB', t:0.00, y:0.66},
+      {label:'LWB', sideId:'LWB', t:0.56, y:Y.WIDE_TOP},
+      {label:'RWB', sideId:'RWB', t:0.56, y:Y.WIDE_BOT},
+      {label:'LCM', sideId:'LCM', t:0.60, y:0.40},
+      {label:'CM',  sideId:'CM',  t:0.52, y:Y.CENTRE},
+      {label:'RCM', sideId:'RCM', t:0.60, y:0.60},
+      {label:'LS',  sideId:'LS',  t:1.00, y:0.40},
+      {label:'RS',  sideId:'RS',  t:1.00, y:0.60},
+    ],
+    '3-4-3 (Flat)': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LCB', sideId:'LCB', t:0.00, y:0.34},
+      {label:'CB',  sideId:'CB',  t:0.00, y:Y.CENTRE},
+      {label:'RCB', sideId:'RCB', t:0.00, y:0.66},
+      {label:'LWB', sideId:'LWB', t:0.58, y:Y.WIDE_TOP},
+      {label:'LCM', sideId:'LCM', t:0.54, y:0.42},
+      {label:'RCM', sideId:'RCM', t:0.54, y:0.58},
+      {label:'RWB', sideId:'RWB', t:0.58, y:Y.WIDE_BOT},
+      {label:'LW',  sideId:'LW',  t:1.00, y:0.24},
+      {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
+      {label:'RW',  sideId:'RW',  t:1.00, y:0.76},
+    ],
+    '3-4-3 (Diamond)': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LCB', sideId:'LCB', t:0.00, y:0.34},
+      {label:'CB',  sideId:'CB',  t:0.00, y:Y.CENTRE},
+      {label:'RCB', sideId:'RCB', t:0.00, y:0.66},
+      {label:'CDM', sideId:'CDM', t:0.40, y:Y.CENTRE},
+      {label:'LCM', sideId:'LCM', t:0.57, y:0.36},
+      {label:'RCM', sideId:'RCM', t:0.57, y:0.64},
+      {label:'CAM', sideId:'CAM', t:0.74, y:Y.CENTRE},
+      {label:'LW',  sideId:'LW',  t:1.00, y:0.22},
+      {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
+      {label:'RW',  sideId:'RW',  t:1.00, y:0.78},
+    ],
+    '4-1-3-2': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
+      {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
+      {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
+      {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
+      {label:'CDM', sideId:'CDM', t:0.30, y:Y.CENTRE},
+      {label:'LM',  sideId:'LM',  t:0.60, y:0.32},
+      {label:'CAM', sideId:'CAM', t:0.60, y:Y.CENTRE},
+      {label:'RM',  sideId:'RM',  t:0.60, y:0.68},
+      {label:'LS',  sideId:'LS',  t:1.00, y:0.42},
+      {label:'RS',  sideId:'RS',  t:1.00, y:0.58},
+    ],
+    '4-3-2-1': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB',  sideId:'LB',  t:0.00, y:Y.WIDE_TOP},
+      {label:'LCB', sideId:'LCB', t:0.00, y:0.40},
+      {label:'RCB', sideId:'RCB', t:0.00, y:0.60},
+      {label:'RB',  sideId:'RB',  t:0.00, y:Y.WIDE_BOT},
+      {label:'LCM', sideId:'LCM', t:0.50, y:0.34},
+      {label:'CDM', sideId:'CDM', t:0.38, y:Y.CENTRE},
+      {label:'RCM', sideId:'RCM', t:0.50, y:0.66},
+      {label:'LAM', sideId:'LAM', t:0.72, y:0.45},
+      {label:'RAM', sideId:'RAM', t:0.72, y:0.55},
+      {label:'ST',  sideId:'ST',  t:1.00, y:Y.CENTRE},
+    ],
+  },
+  '9v9': {
+    '3-3-2': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB', sideId:'LB', t:0.00, y:Y.WIDE_TOP},
+      {label:'CB', sideId:'CB', t:0.00, y:Y.CENTRE},
+      {label:'RB', sideId:'RB', t:0.00, y:Y.WIDE_BOT},
+      {label:'LM', sideId:'LM', t:0.56, y:0.28},
+      {label:'CM', sideId:'CM', t:0.50, y:Y.CENTRE},
+      {label:'RM', sideId:'RM', t:0.56, y:0.72},
+      {label:'LS', sideId:'LS', t:1.00, y:0.42},
+      {label:'RS', sideId:'RS', t:1.00, y:0.58},
+    ],
+    '3-4-1': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB', sideId:'LB', t:0.00, y:Y.WIDE_TOP},
+      {label:'CB', sideId:'CB', t:0.00, y:Y.CENTRE},
+      {label:'RB', sideId:'RB', t:0.00, y:Y.WIDE_BOT},
+      {label:'LM', sideId:'LM', t:0.54, y:0.22},
+      {label:'LCM', sideId:'LCM', t:0.48, y:0.40},
+      {label:'RCM', sideId:'RCM', t:0.48, y:0.60},
+      {label:'RM', sideId:'RM', t:0.54, y:0.78},
+      {label:'ST', sideId:'ST', t:1.00, y:Y.CENTRE},
+    ],
+    '2-3-3': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LCB', sideId:'LCB', t:0.00, y:0.36},
+      {label:'RCB', sideId:'RCB', t:0.00, y:0.64},
+      {label:'LM', sideId:'LM', t:0.54, y:0.26},
+      {label:'CM', sideId:'CM', t:0.46, y:Y.CENTRE},
+      {label:'RM', sideId:'RM', t:0.54, y:0.74},
+      {label:'LW', sideId:'LW', t:1.00, y:0.24},
+      {label:'ST', sideId:'ST', t:1.00, y:Y.CENTRE},
+      {label:'RW', sideId:'RW', t:1.00, y:0.76},
+    ],
+  },
+  '7v7': {
+    '2-3-1': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB', sideId:'LB', t:0.00, y:0.32},
+      {label:'RB', sideId:'RB', t:0.00, y:0.68},
+      {label:'LM', sideId:'LM', t:0.58, y:0.24},
+      {label:'CM', sideId:'CM', t:0.50, y:Y.CENTRE},
+      {label:'RM', sideId:'RM', t:0.58, y:0.76},
+      {label:'ST', sideId:'ST', t:1.00, y:Y.CENTRE},
+    ],
+    '3-2-1': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB', sideId:'LB', t:0.00, y:0.28},
+      {label:'CB', sideId:'CB', t:0.00, y:Y.CENTRE},
+      {label:'RB', sideId:'RB', t:0.00, y:0.72},
+      {label:'LCM', sideId:'LCM', t:0.54, y:0.40},
+      {label:'RCM', sideId:'RCM', t:0.54, y:0.60},
+      {label:'ST', sideId:'ST', t:1.00, y:Y.CENTRE},
+    ],
+    '3-1-2': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB', sideId:'LB', t:0.00, y:0.28},
+      {label:'CB', sideId:'CB', t:0.00, y:Y.CENTRE},
+      {label:'RB', sideId:'RB', t:0.00, y:0.72},
+      {label:'CM', sideId:'CM', t:0.54, y:Y.CENTRE},
+      {label:'LS', sideId:'LS', t:1.00, y:0.42},
+      {label:'RS', sideId:'RS', t:1.00, y:0.58},
+    ],
+    '2-1-1-2': [
+      {label:'GK', sideId:'GK', t:null, y:Y.CENTRE},
+      {label:'LB', sideId:'LB', t:0.00, y:0.34},
+      {label:'RB', sideId:'RB', t:0.00, y:0.66},
+      {label:'CDM', sideId:'CDM', t:0.36, y:Y.CENTRE},
+      {label:'CAM', sideId:'CAM', t:0.66, y:Y.CENTRE},
+      {label:'LS', sideId:'LS', t:1.00, y:0.42},
+      {label:'RS', sideId:'RS', t:1.00, y:0.58},
+    ],
+  }
 };
+
+const DEFAULT_GAME_FORMAT = '11v11';
+const DEFAULT_FORMATIONS = {
+  '11v11': {left:'4-4-2 (Flat)', right:'4-3-3'},
+  '9v9': {left:'3-3-2', right:'3-3-2'},
+  '7v7': {left:'2-3-1', right:'2-3-1'}
+};
+
+let currentGameFormat = DEFAULT_GAME_FORMAT;
+
+function formationsFor(formatKey){
+  return FORMATION_SETS[formatKey] || FORMATION_SETS[DEFAULT_GAME_FORMAT];
+}
+function formationKeysFor(formatKey){
+  return Object.keys(formationsFor(formatKey));
+}
+function defaultFormationFor(formatKey, teamId){
+  return DEFAULT_FORMATIONS[formatKey]?.[teamId] || formationKeysFor(formatKey)[0];
+}
 
 /* ---------- Role grouping for visibility ordering ---------- */
 const GROUPS = {
@@ -212,6 +306,7 @@ class Team {
     }
   }
   setFormation(key){
+    if(!formationsFor(currentGameFormat)[key]) return;
     this.formationKey = key;
     this.buildPlayers();
     this.updatePositions();
@@ -253,7 +348,10 @@ class Team {
   buildPlayers(){
     while(this.layer.firstChild) this.layer.removeChild(this.layer.firstChild);
     this.players = [];
-    const roles = FORMATIONS[this.formationKey];
+    const activeFormations = formationsFor(currentGameFormat);
+    const fallbackKey = defaultFormationFor(currentGameFormat, this.id);
+    const roles = activeFormations[this.formationKey] || activeFormations[fallbackKey];
+    this.formationKey = activeFormations[this.formationKey] ? this.formationKey : fallbackKey;
 
     for(const r of roles){
       const g = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -661,12 +759,14 @@ function updatePitchOrientation(){
 /* ---------- App state ---------- */
 const layers = { left: document.getElementById('teamLeftLayer'), right: document.getElementById('teamRightLayer') };
 const teams = {
-  left:  new Team({id:'left',  attack:+1, layer: layers.left,  colorKey:'red',  formationKey:'4-4-2 (Flat)'}), // Home = Red
-  right: new Team({id:'right', attack:-1, layer: layers.right, colorKey:'blue', formationKey:'4-3-3'})  // Away = Blue
+  left:  new Team({id:'left',  attack:+1, layer: layers.left,  colorKey:'red',  formationKey: defaultFormationFor(currentGameFormat, 'left')}), // Home = Red
+  right: new Team({id:'right', attack:-1, layer: layers.right, colorKey:'blue', formationKey: defaultFormationFor(currentGameFormat, 'right')})  // Away = Blue
 };
 buildBall();
 
 /* ---------- Controls ---------- */
+const leftGameFormatSel = document.getElementById('leftGameFormat');
+const rightGameFormatSel = document.getElementById('rightGameFormat');
 const leftFormationSel  = document.getElementById('leftFormation');
 const rightFormationSel = document.getElementById('rightFormation');
 const leftColorSel      = document.getElementById('leftColor');
@@ -741,7 +841,9 @@ if(focusModeToggle){
 }
 
 function populateFormationOptions(){
-  const keys = Object.keys(FORMATIONS);
+  const keys = formationKeysFor(currentGameFormat);
+  leftFormationSel.innerHTML = '';
+  rightFormationSel.innerHTML = '';
   for(const k of keys){
     const o1 = document.createElement('option'); o1.value=k; o1.textContent=k; leftFormationSel.appendChild(o1);
     const o2 = document.createElement('option'); o2.value=k; o2.textContent=k; rightFormationSel.appendChild(o2);
@@ -749,9 +851,26 @@ function populateFormationOptions(){
   leftFormationSel.value = teams.left.formationKey;
   rightFormationSel.value = teams.right.formationKey;
 }
-populateFormationOptions();
+
+function setGameFormat(formatKey){
+  if(!FORMATION_SETS[formatKey]) return;
+  currentGameFormat = formatKey;
+  if(leftGameFormatSel) leftGameFormatSel.value = formatKey;
+  if(rightGameFormatSel) rightGameFormatSel.value = formatKey;
+
+  teams.left.setFormation(defaultFormationFor(formatKey, 'left'));
+  teams.right.setFormation(defaultFormationFor(formatKey, 'right'));
+  populateFormationOptions();
+  resetAllToKickoff();
+}
 
 function initControls(){
+  // Shared game format
+  if(leftGameFormatSel) leftGameFormatSel.value = currentGameFormat;
+  if(rightGameFormatSel) rightGameFormatSel.value = currentGameFormat;
+  leftGameFormatSel?.addEventListener('change', e=> setGameFormat(e.target.value));
+  rightGameFormatSel?.addEventListener('change', e=> setGameFormat(e.target.value));
+
   // Colors
   leftColorSel.value = teams.left.colorKey;
   rightColorSel.value = teams.right.colorKey;
@@ -775,6 +894,8 @@ function initControls(){
   // Visibility UIs
   teams.left.connectVisibilityUI(leftVisGrid, leftShowAll, leftHideAll);
   teams.right.connectVisibilityUI(rightVisGrid, rightShowAll, rightHideAll);
+
+  populateFormationOptions();
 
   // Resets
   btnResetDragged.addEventListener('click', ()=>{

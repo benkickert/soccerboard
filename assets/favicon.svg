@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
+  <rect width="64" height="64" fill="none" />
+  <g transform="translate(2 3) rotate(-8 32 32)">
+    <text
+      x="3"
+      y="43"
+      fill="#5b5b5b"
+      font-family="Mistral, Brush Script MT, Segoe Script, Lucida Handwriting, cursive"
+      font-size="41"
+      font-style="italic"
+      letter-spacing="-3.4"
+    >BK</text>
+    <text
+      x="1"
+      y="40"
+      fill="#ffffff"
+      stroke="#181818"
+      stroke-width="0.9"
+      paint-order="stroke fill"
+      font-family="Mistral, Brush Script MT, Segoe Script, Lucida Handwriting, cursive"
+      font-size="41"
+      font-style="italic"
+      letter-spacing="-3.4"
+    >BK</text>
+  </g>
+</svg>

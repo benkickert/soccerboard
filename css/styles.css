@@ -428,20 +428,20 @@
   @media (max-width: 900px){
     .layout{grid-template-columns: 1fr}
     .controls.right{order:3} .controls{order:1} .canvas-wrap{order:2; min-height:60vh}
-    #leftControls .panel{
+    #rightControls .panel{
       display:flex;
       flex-direction:column;
     }
-    #leftControls .instructions{
+    #rightControls .instructions{
       order:1;
       margin-top:0;
       margin-bottom:12px;
     }
-    #leftControls .panel > h2{
+    #rightControls .panel > h2{
       order:2;
     }
-    #leftControls .row,
-    #leftControls .vis-panel{
+    #rightControls .row,
+    #rightControls .vis-panel{
       order:3;
     }
     header{

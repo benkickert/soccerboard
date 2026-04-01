@@ -431,8 +431,9 @@
     body.focus-mode .layout{height:100vh; min-height:0}
     @supports (height: 100dvh){ body.focus-mode .layout{height:100dvh;} }
     .controls.right{order:3} .controls{order:1}
-    .canvas-wrap{order:2; height:calc(100vh - 90px); min-height:50vh}
-    @supports (height: 100dvh){ .canvas-wrap{height:calc(100dvh - 90px);} }
+    .canvas-wrap{order:2; height:42vh; min-height:180px}
+    body.focus-mode .canvas-wrap{height:calc(100vh - 50px); min-height:0}
+    @supports (height: 100dvh){ body.focus-mode .canvas-wrap{height:calc(100dvh - 50px);} }
     #rightControls .panel{
       display:flex;
       flex-direction:column;

@@ -759,19 +759,25 @@ function svgPointFromEvent(ev){
   const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
   return pt.matrixTransform(scene.getScreenCTM().inverse());
 }
+const mobileQuery = window.matchMedia('(max-width: 900px)');
+
 function updatePitchOrientation(){
   if(!canvasWrap || !svg || !scene) return;
   const rect = canvasWrap.getBoundingClientRect();
   if(rect.width <= 0 || rect.height <= 0) return;
 
-  const areaRatio = rect.width / rect.height;
-  const landscapeRatio = PITCH_LEN / PITCH_WID; // 115/75
-  const portraitRatio = PITCH_WID / PITCH_LEN;  // 75/115
-
-  // Compare relative distance to both target ratios.
-  const distLandscape = Math.abs(Math.log(areaRatio / landscapeRatio));
-  const distPortrait = Math.abs(Math.log(areaRatio / portraitRatio));
-  const portrait = distPortrait < distLandscape;
+  let portrait;
+  if(mobileQuery.matches){
+    // Mobile: landscape when controls visible, portrait in focus mode
+    const focusOn = document.body.classList.contains('focus-mode');
+    portrait = focusOn;
+  }else{
+    // Desktop: auto-detect best fit from container aspect ratio
+    const areaRatio = rect.width / rect.height;
+    const distLandscape = Math.abs(Math.log(areaRatio / (PITCH_LEN / PITCH_WID)));
+    const distPortrait  = Math.abs(Math.log(areaRatio / (PITCH_WID / PITCH_LEN)));
+    portrait = distPortrait < distLandscape;
+  }
 
   const changed = portrait !== isPitchPortrait;
   isPitchPortrait = portrait;

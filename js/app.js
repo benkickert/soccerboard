@@ -475,9 +475,12 @@ class Team {
   hideAllPlayers(){ for(const p of this.players) this.setPlayerVisibility(p, false); }
 
   attachDragHandlers(pl){
+    pl.g.style.touchAction = 'none';
     const onDown = (ev)=>{
       ev.preventDefault();
-      pl.g.setPointerCapture(ev.pointerId);
+      ev.stopPropagation();
+      const target = ev.target;
+      try{ target.setPointerCapture(ev.pointerId); }catch(e){}
       pl.g.style.cursor = 'grabbing';
       let start = svgPointFromEvent(ev);
       const startDX = pl.dragDX, startDY = pl.dragDY;
@@ -502,7 +505,7 @@ class Team {
         document.removeEventListener('pointercancel', cancel);
       };
       const up = (e)=>{
-        if(pl.g.hasPointerCapture(e.pointerId)) pl.g.releasePointerCapture(e.pointerId);
+        try{ if(target.hasPointerCapture(e.pointerId)) target.releasePointerCapture(e.pointerId); }catch(ex){}
         cleanup();
         const dx = pl.x - ball.x, dy = pl.y - ball.y;
         if(dx*dx + dy*dy <= (1.9*1.9)) attachBall(pl);
@@ -522,7 +525,7 @@ class Team {
         }
       };
       const cancel = (e)=>{
-        if(pl.g.hasPointerCapture(e.pointerId)) pl.g.releasePointerCapture(e.pointerId);
+        try{ if(target.hasPointerCapture(e.pointerId)) target.releasePointerCapture(e.pointerId); }catch(ex){}
         cleanup();
       };
       document.addEventListener('pointermove', move);
@@ -623,6 +626,10 @@ function buildBall(){
   halo.setAttribute('opacity', '0.85');
   halo.style.pointerEvents = 'none';
 
+  const hitArea = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  hitArea.setAttribute('r', ball.r + 1.8);
+  hitArea.setAttribute('fill', 'transparent');
+
   const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
   c.setAttribute('r', ball.r);
   c.setAttribute('fill', '#ffffff');
@@ -632,15 +639,22 @@ function buildBall(){
   c.style.cursor='grab';
 
   g.appendChild(halo);
+  g.appendChild(hitArea);
   g.appendChild(c);
   ball.layer.appendChild(g);
-  ball.g=g; ball.circ=c; ball.halo=halo;
+  ball.g=g; ball.circ=c; ball.halo=halo; ball.hitArea=hitArea;
   positionBall(ball.x, ball.y);
   setBallHaloVisible(true);
 
+  g.style.touchAction = 'none';
+
   const onDown = (ev)=>{
     ev.preventDefault();
-    g.setPointerCapture(ev.pointerId);
+    ev.stopPropagation();
+    const target = ev.target;
+    if(target.hasPointerCapture && target.setPointerCapture){
+      try{ target.setPointerCapture(ev.pointerId); }catch(e){}
+    }
     g.style.cursor='grabbing';
     const start = svgPointFromEvent(ev);
     const sx=ball.x, sy=ball.y;
@@ -661,7 +675,7 @@ function buildBall(){
       document.removeEventListener('pointercancel', cancel);
     };
     const up = (e)=>{
-      if(g.hasPointerCapture(e.pointerId)) g.releasePointerCapture(e.pointerId);
+      try{ if(target.hasPointerCapture(e.pointerId)) target.releasePointerCapture(e.pointerId); }catch(ex){}
       cleanup();
       const hit = hitTestPlayers(ball.x, ball.y);
       if(hit) attachBall(hit);
@@ -671,7 +685,7 @@ function buildBall(){
       }
     };
     const cancel = (e)=>{
-      if(g.hasPointerCapture(e.pointerId)) g.releasePointerCapture(e.pointerId);
+      try{ if(target.hasPointerCapture(e.pointerId)) target.releasePointerCapture(e.pointerId); }catch(ex){}
       cleanup();
     };
     document.addEventListener('pointermove', move);
@@ -692,6 +706,7 @@ function positionBall(x,y){
   ball.circ.setAttribute('cy', ball.y);
   ball.halo.setAttribute('cx', ball.x);
   ball.halo.setAttribute('cy', ball.y);
+  if(ball.hitArea){ ball.hitArea.setAttribute('cx', ball.x); ball.hitArea.setAttribute('cy', ball.y); }
 }
 function attackSideOffsetFor(team){ return (team.attack===+1) ? +2.3 : -2.3; }
 function safeDropOffsetFor(team){

@@ -475,7 +475,6 @@ class Team {
   hideAllPlayers(){ for(const p of this.players) this.setPlayerVisibility(p, false); }
 
   attachDragHandlers(pl){
-    pl.g.style.touchAction = 'none';
     const onDown = (ev)=>{
       ev.preventDefault();
       ev.stopPropagation();
@@ -533,6 +532,7 @@ class Team {
       document.addEventListener('pointercancel', cancel);
     };
     pl.g.addEventListener('pointerdown', onDown);
+    pl.g.addEventListener('touchstart', (e)=>{ e.preventDefault(); }, {passive:false});
   }
 
   /* ----- Visibility UI ----- */
@@ -646,9 +646,9 @@ function buildBall(){
   positionBall(ball.x, ball.y);
   setBallHaloVisible(true);
 
-  g.style.touchAction = 'none';
-
   const onDown = (ev)=>{
+    // If ball is attached to a player, ignore drag — detach only via double-tap
+    if(ball.attachedTo) return;
     ev.preventDefault();
     ev.stopPropagation();
     const target = ev.target;
@@ -666,7 +666,6 @@ function buildBall(){
       let ny = clampY(sy + (pt.y-start.y));
       if(Math.hypot(nx - sx, ny - sy) > 0.2) moved = true;
       positionBall(nx, ny);
-      if(ball.attachedTo) detachBall();
     };
     const cleanup = ()=>{
       g.style.cursor='grab';
@@ -693,6 +692,7 @@ function buildBall(){
     document.addEventListener('pointercancel', cancel);
   };
   g.addEventListener('pointerdown', onDown);
+  g.addEventListener('touchstart', (e)=>{ if(!ball.attachedTo) e.preventDefault(); }, {passive:false});
   g.addEventListener('dblclick', ()=> detachBall());
 }
 function setBallHaloVisible(on){
@@ -720,6 +720,7 @@ function attachBall(pl){
   ball.attachedTo = pl;
   pl.hasBall = true;
   positionBallAtPlayer(pl);
+  if(ball.g) ball.g.style.pointerEvents = 'none';
   if(!ball.draggedOnce){
     ball.draggedOnce = true;
     setBallHaloVisible(false);
@@ -730,11 +731,13 @@ function detachBall(){
     ball.attachedTo.hasBall = false;
     ball.attachedTo = null;
   }
+  if(ball.g) ball.g.style.pointerEvents = '';
 }
 function detachBallWithSideDrop(pl){
   if(ball.attachedTo === pl){
     pl.hasBall = false;
     ball.attachedTo = null;
+    if(ball.g) ball.g.style.pointerEvents = '';
     positionBall(pl.x + safeDropOffsetFor(pl.team), pl.y);
   }
 }
@@ -1001,3 +1004,4 @@ if(typeof ResizeObserver !== 'undefined' && canvasWrap){
   ro.observe(canvasWrap);
 }
 window.addEventListener('resize', ()=> updatePitchOrientation());
+
